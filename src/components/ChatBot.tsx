@@ -16,7 +16,6 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // ESCUTA O COMANDO DO BOTÃO LÁ DE CIMA (PAGE.TSX)
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
     window.addEventListener('open-daniel-chat', handleOpen);
@@ -52,15 +51,12 @@ export default function ChatBot() {
     }
   }
 
-  // Se não estiver aberto, não renderiza nada
   if (!isOpen) return null;
 
   return (
-    /* AQUI ESTÁ A MÁGICA: FIXED PARA FICAR EM CIMA DE TUDO NO CANTO */
     <div className="fixed bottom-6 right-6 z-[9999] animate-in slide-in-from-bottom-5 duration-300">
       <div className="bg-[#020817]/95 border border-cyan-500/30 backdrop-blur-2xl w-[320px] sm:w-[380px] h-[520px] rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden">
         
-        {/* Header Premium */}
         <div className="bg-gradient-to-r from-cyan-500/20 to-transparent p-6 border-b border-white/5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="bg-cyan-500/20 p-2 rounded-xl">
@@ -71,13 +67,11 @@ export default function ChatBot() {
               <span className="block text-[10px] text-cyan-400 uppercase tracking-widest font-black">Online agora</span>
             </div>
           </div>
-          {/* Botão de fechar */}
           <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition-all p-1">
             <X size={24} />
           </button>
         </div>
 
-        {/* Área de Mensagens */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 bg-transparent scrollbar-hide">
           {messages.map((m, i) => (
             <div key={i} className={cn("flex flex-col", m.role === 'user' ? "items-end" : "items-start")}>
@@ -100,18 +94,31 @@ export default function ChatBot() {
           )}
         </div>
 
-        {/* Input de Texto */}
         <div className="p-4 border-t border-white/5 bg-white/[0.02]">
           <div className="relative flex items-center">
             <input 
+              type="text"
               autoFocus
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => {
+                if(e.key === 'Enter') {
+                   e.preventDefault();
+                   sendMessage();
+                }
+              }}
               placeholder="Escreva sua mensagem..."
-              className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+              className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 appearance-none"
+              style={{ fontSize: '16px' }} 
             />
-            <button onClick={sendMessage} className="absolute right-2 p-2 bg-cyan-500 rounded-xl text-black hover:bg-white transition-colors">
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                sendMessage();
+              }} 
+              className="absolute right-2 p-2 bg-cyan-500 rounded-xl text-black hover:bg-white transition-colors z-10"
+            >
               <Send size={16} />
             </button>
           </div>
@@ -119,4 +126,5 @@ export default function ChatBot() {
       </div>
     </div>
   )
-}
+                                       }
+              

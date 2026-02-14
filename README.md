@@ -1,109 +1,116 @@
 <!-- ===================================================== -->
-<!-- ================ AGÊNCIA IA DINIZ =================== -->
+<!-- ================== AGÊNCIA IA DINIZ ================= -->
 <!-- ===================================================== -->
 
-# 🧠 Agência IA Diniz  
+<p align="center">
 
-```
-     ___                       _           ___ ___ ___ _   _ _____ _____ 
-    / _ \ _   _  ___  ___ ___ | | ___     |_ _|_ _|_ _| \ | |_   _| ____|
-   | | | | | | |/ _ \/ __/ _ \| |/ _ \     | | | | | ||  \| | | | |  _|  
-   | |_| | |_| |  __/ (_| (_) | |  __/     | | | | | || |\  | | | | |___ 
-    \__\_\\__,_|\___|\___\___/|_|\___|    |___|___|___|_| \_| |_| |_____|
-```
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f2027,50:203a43,100:2c5364&height=250&section=header&text=Agência%20IA%20Diniz&fontSize=45&fontColor=ffffff&animation=fadeIn&fontAlignY=35"/>
 
-🚀 Plataforma moderna de soluções digitais com Inteligência Artificial.  
-Focada em automação, geração de conteúdo estratégico e escalabilidade de negócios.
+</p>
+
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&width=600&lines=Plataforma+de+Inteligência+Artificial;Automação+e+Soluções+Digitais;Construindo+o+Futuro+com+Código+e+IA;Daniel+Diniz+-+Full+Stack+Developer" />
+</p>
 
 ---
 
-## 🏆 Status do Projeto
+<p align="center">
 
-![Status](https://img.shields.io/badge/status-Em%20Produção-green)
-![Frontend](https://img.shields.io/badge/Frontend-React-blue)
-![IA](https://img.shields.io/badge/IA-Integration-orange)
-![Deploy](https://img.shields.io/badge/Deploy-Vercel-black)
-![License](https://img.shields.io/badge/license-MIT-purple)
+![Status](https://img.shields.io/badge/Status-Em%20Produção-00ffcc?style=for-the-badge)
+![IA](https://img.shields.io/badge/AI-Integration-ff00ff?style=for-the-badge)
+![Frontend](https://img.shields.io/badge/Frontend-React-blue?style=for-the-badge)
+![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
----
-
-## 🌍 Visão Geral
-
-A Agência IA Diniz foi desenvolvida para oferecer soluções inteligentes utilizando Inteligência Artificial aplicada a:
-
-- 📈 Marketing Digital
-- ✍️ Geração de Conteúdo Automatizado
-- 🤖 Automação de Processos
-- 🧠 Soluções Personalizadas com IA
-- 🚀 Escalabilidade Digital
-
-O projeto demonstra habilidades reais em arquitetura moderna, organização de código, integração com APIs e deploy profissional.
+</p>
 
 ---
 
-## 🚀 Demonstração
+# 🧠 Agência IA Diniz
 
-🔗 Repositório Oficial:  
-https://github.com/dinizdaniel284/Agencia-IA-Diniz
-
----
-
-## 🛠️ Stack Tecnológica
-
-| Tecnologia        | Função                          |
-|------------------|---------------------------------|
-| React / Next.js  | Estrutura Frontend              |
-| Tailwind CSS     | Estilização moderna             |
-| APIs de IA       | Processamento inteligente       |
-| Vercel           | Deploy e hospedagem             |
-| Git & GitHub     | Versionamento e CI/CD           |
+🚀 Plataforma moderna de soluções com Inteligência Artificial voltada para automação, geração de conteúdo estratégico e escalabilidade digital.
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🌌 Visão Estratégica
 
-```
-src/
- ├── components/
- ├── pages/
- ├── services/
- ├── assets/
- ├── styles/
- └── utils/
-```
+A **Agência IA Diniz** é um projeto arquitetado como produto digital.
 
-Arquitetura organizada para:
+Ele demonstra:
 
-- Separação de responsabilidades
-- Escalabilidade futura
-- Manutenção simplificada
-- Evolução para SaaS
+✔ Estrutura escalável  
+✔ Organização modular  
+✔ Integração com APIs de IA  
+✔ Deploy profissional  
+✔ Mentalidade SaaS  
 
 ---
 
-## 🧠 Arquitetura do Sistema
+## ⚡ Demonstração Visual
+
+<p align="center">
+<img src="https://media.giphy.com/media/qgQUggAC3Pfv687qPC/giphy.gif" width="600"/>
+</p>
+
+---
+
+## 🛠 Stack Tecnológica
+
+<p align="center">
+
+<img src="https://skillicons.dev/icons?i=react,nextjs,tailwind,nodejs,git,github,vercel" />
+
+</p>
+
+---
+
+## 📊 Arquitetura da Aplicação
 
 ```
 Usuário
    ↓
-Interface React
+Interface React (Frontend)
    ↓
 Camada de Serviços
    ↓
-Integração com API de IA
+Integração com APIs de IA
    ↓
 Processamento Inteligente
    ↓
 Resposta Dinâmica
 ```
 
-Estrutura preparada para futura integração com:
+Preparado para expansão com:
 
-- Banco de dados
+- Banco de Dados
 - Autenticação JWT
-- Dashboard administrativo
-- Analytics
-- Sistema de pagamentos
+- Dashboard Administrativo
+- Sistema de Pagamentos
+- Analytics em tempo real
+
+---
+
+## 📈 Roadmap Futuro
+
+- [ ] Login & Autenticação
+- [ ] Dashboard Administrativo
+- [ ] Área exclusiva para clientes
+- [ ] Integração com banco de dados
+- [ ] Sistema SaaS completo
+- [ ] Monetização por assinatura
+- [ ] Analytics avançado
+
+---
+
+## 💰 Modelo de Negócio
+
+Estruturado para evolução em:
+
+- SaaS
+- White-label
+- Serviços personalizados com IA
+- Licenciamento de tecnologia
+- Automação empresarial
 
 ---
 
@@ -126,11 +133,9 @@ http://localhost:3000
 
 ## 🔄 CI/CD (Deploy Automático)
 
-Crie o arquivo:
+Criar arquivo:
 
 .github/workflows/deploy.yml
-
-Conteúdo:
 
 ```yaml
 name: Deploy
@@ -162,88 +167,51 @@ jobs:
 
 ---
 
-## 📈 Roadmap de Evolução
+## 🧠 Diferencial Técnico
 
-- [ ] Sistema de login e autenticação
-- [ ] Dashboard administrativo
-- [ ] Área exclusiva para clientes
-- [ ] Integração com banco de dados
-- [ ] Sistema de pagamentos
-- [ ] Analytics em tempo real
-- [ ] Versão multilíngue
-- [ ] Transformação em SaaS
-
----
-
-## 💰 Modelo de Monetização
-
-Possibilidades estratégicas:
-
-- Assinatura mensal
-- Pacotes personalizados de serviços
-- Licenciamento da tecnologia
-- White-label para empresas
-- Venda de soluções IA sob demanda
-
----
-
-## 🎯 Diferenciais Técnicos
-
-- Código organizado e modular
-- Estrutura escalável
-- Integração com IA real
-- Deploy profissional
-- Pensado como produto digital
-- Mentalidade de arquitetura
-
----
-
-## 🧪 Aprendizados Técnicos Aplicados
-
-- Organização de projeto em camadas
-- Integração com APIs externas
-- Estruturação para crescimento futuro
-- Deploy em ambiente de produção
-- Uso estratégico de IA em aplicações reais
-
----
-
-## 🛡️ Segurança e Boas Práticas
-
-- Uso de variáveis de ambiente
-- Separação entre frontend e lógica de serviços
-- Estrutura preparada para autenticação futura
-- Versionamento organizado
+- Código modular
+- Arquitetura escalável
+- Separação de responsabilidades
+- Integração real com IA
+- Deploy em produção
+- Estrutura pronta para SaaS
 
 ---
 
 ## 👨‍💻 Autor
 
-Daniel Diniz  
-Santa Rita do Passa Quatro – SP  
-Desenvolvedor Full Stack em evolução  
-Foco em IA, Backend e Arquitetura de Software  
+<p align="center">
 
-GitHub:  
-https://github.com/dinizdaniel284
+<img src="https://github.com/dinizdaniel284.png" width="120" style="border-radius:50%"/>
+
+</p>
+
+<p align="center">
+<b>Daniel Diniz</b><br>
+Santa Rita do Passa Quatro – SP<br>
+Full Stack Developer | IA | Backend | Arquitetura de Software
+</p>
+
+<p align="center">
+<a href="https://github.com/dinizdaniel284">
+<img src="https://img.shields.io/badge/GitHub-Perfil-black?style=for-the-badge&logo=github"/>
+</a>
+</p>
 
 ---
 
 ## 📜 Licença
 
-Este projeto está sob a licença MIT.
+MIT License
 
 ---
 
-## 🚀 Próxima Evolução
+<p align="center">
 
-Este projeto é a base para evolução em:
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:2c5364,50:203a43,100:0f2027&height=120&section=footer"/>
 
-- Engenharia de Software
-- Arquitetura de Sistemas
-- Desenvolvimento SaaS
-- Soluções IA escaláveis
+</p>
 
 ---
 
-# ⭐ Se este projeto foi útil, deixe uma estrela!
+# ⭐ Se este projeto impressionou você, deixe uma estrela!

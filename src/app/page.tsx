@@ -18,7 +18,8 @@ export default function Home() {
     <main style={{
       backgroundColor: '#0b1120', color: 'white', minHeight: '100vh', width: '100%',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      fontFamily: 'sans-serif', overflowX: 'hidden', position: 'relative'
+      fontFamily: 'sans-serif', overflowX: 'hidden', position: 'relative',
+      WebkitOverflowScrolling: 'touch' // Suaviza rolagem no iOS
     }}>
       
       <nav style={{
@@ -49,7 +50,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="neural-network"></div>
+      {/* FUNDO OTIMIZADO - pointer-events-none é a chave aqui */}
+      <div className="neural-network" style={{ pointerEvents: 'none' }}></div>
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1250px', width: '100%', padding: '60px 40px' }}>
         
@@ -98,34 +100,32 @@ export default function Home() {
           background: linear-gradient(90deg, #22d3ee, #3b82f6, #a855f7, #f472b6, #22d3ee);
           background-size: 300% auto;
           -webkit-background-clip: text;
-          -webkit-fill-color: transparent;
-          -webkit-background-clip: text;
-          animation: colorShift 5s linear infinite;
+          -webkit-text-fill-color: transparent;
+          animation: colorShift 8s linear infinite; /* Aumentei o tempo para ser mais suave */
+          will-change: background-position;
         }
         @keyframes colorShift { to { background-position: 300% center; } }
         .neural-network {
-          position: absolute; inset: 0; opacity: 0.15;
-          background-image: radial-gradient(#22d3ee 1.2px, transparent 1.2px);
-          background-size: 50px 50px;
-          animation: networkFloat 20s linear infinite;
+          position: absolute; inset: 0; opacity: 0.1; /* Diminuído a opacidade */
+          background-image: radial-gradient(#22d3ee 1px, transparent 1px);
+          background-size: 60px 60px;
+          animation: networkFloat 30s linear infinite;
+          will-change: transform;
           z-index: 1;
         }
         @keyframes networkFloat {
           0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(20px, 20px); }
+          50% { transform: translate(10px, 10px); }
         }
         .btn-glow {
           display: inline-flex; align-items: center; gap: 12px;
           background-color: #22d3ee; color: #020817; padding: 18px 35px;
           border-radius: 12px; font-weight: 900; text-decoration: none;
           box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); transition: 0.3s;
+          will-change: transform;
         }
-        .btn-glow:hover { transform: translateY(-3px); background-color: white; color: #020817; }
-        .chatbot-trigger:hover { background-color: #22d3ee !important; color: #0b1120 !important; }
-        .animate-ping { animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
-        .animate-pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .btn-glow:hover { transform: translateY(-3px); background-color: white; }
+        .animate-ping { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
       `}</style>
     </main>
   )
@@ -157,5 +157,5 @@ function ProjectCard({ title, img, tag, url }: any) {
       </div>
     </div>
   )
-            }
-                     
+          }
+        

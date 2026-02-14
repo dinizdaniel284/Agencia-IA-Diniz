@@ -1,41 +1,62 @@
 import ChatBot from "@/components/ChatBot"
+import Image from "next/image"
 
 export default function Home() {
   return (
     <main className="min-h-screen px-6">
 
       {/* HERO */}
-      <section className="text-center py-32 max-w-5xl mx-auto">
-        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-          Daniel Tech IA
-        </h1>
+      <section className="relative py-32 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
 
-        <p className="mt-6 text-gray-400 text-lg md:text-xl max-w-3xl mx-auto">
-          Engenharia de Software, Automações Inteligentes e Soluções com IA
-          para transformar negócios em máquinas digitais.
-        </p>
+        {/* TEXTO */}
+        <div className="flex-1 text-center md:text-left">
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+            Daniel Tech IA
+          </h1>
 
-        <div className="mt-10 flex justify-center gap-6">
-          <button className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 transition rounded-xl glow">
-            Começar Projeto
-          </button>
-          <button className="px-8 py-3 border border-gray-600 hover:border-indigo-500 transition rounded-xl">
-            Ver Serviços
-          </button>
+          <p className="mt-6 text-gray-400 text-lg md:text-xl max-w-xl mx-auto md:mx-0">
+            Engenharia de Software, Automações Inteligentes e Soluções com IA
+            para transformar negócios em máquinas digitais.
+          </p>
+
+          <div className="mt-10 flex justify-center md:justify-start gap-6">
+            <button className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 transition rounded-xl glow">
+              Começar Projeto
+            </button>
+            <button className="px-8 py-3 border border-gray-600 hover:border-indigo-500 transition rounded-xl">
+              Ver Serviços
+            </button>
+          </div>
         </div>
+
+        {/* IMAGEM */}
+        <div className="flex-1 relative">
+          <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full"></div>
+
+          <Image
+            src="https://images.unsplash.com/photo-1677442136019-21780ecad995"
+            alt="AI Technology"
+            width={600}
+            height={600}
+            className="relative rounded-3xl shadow-2xl"
+          />
+        </div>
+
       </section>
 
       {/* MÉTRICAS */}
       <section className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto py-20 text-center">
-        <div>
+        <div className="p-6 border border-gray-800 rounded-2xl hover:border-indigo-500 transition">
           <h2 className="text-4xl font-bold text-indigo-400">+10</h2>
           <p className="text-gray-400 mt-2">Projetos Criados</p>
         </div>
-        <div>
+
+        <div className="p-6 border border-gray-800 rounded-2xl hover:border-indigo-500 transition">
           <h2 className="text-4xl font-bold text-indigo-400">100%</h2>
           <p className="text-gray-400 mt-2">Código Autorais</p>
         </div>
-        <div>
+
+        <div className="p-6 border border-gray-800 rounded-2xl hover:border-indigo-500 transition">
           <h2 className="text-4xl font-bold text-indigo-400">IA</h2>
           <p className="text-gray-400 mt-2">Integrações Inteligentes</p>
         </div>
@@ -72,8 +93,16 @@ export default function Home() {
       </section>
 
       {/* CHAT */}
-      <section className="py-24">
-        <ChatBot />
+      <section className="py-32 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Converse com nossa IA
+          </h2>
+
+          <div className="bg-black/40 backdrop-blur-xl border border-gray-800 rounded-3xl p-6 shadow-xl">
+            <ChatBot />
+          </div>
+        </div>
       </section>
 
       {/* CTA FINAL */}
@@ -81,6 +110,7 @@ export default function Home() {
         <h2 className="text-4xl font-bold">
           Vamos Construir Algo Grande?
         </h2>
+
         <p className="text-gray-400 mt-4">
           Transforme sua ideia em um sistema inteligente e escalável.
         </p>
@@ -98,4 +128,3 @@ export default function Home() {
     </main>
   )
 }
-

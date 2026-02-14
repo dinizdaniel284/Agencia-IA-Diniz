@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, Cpu, Zap, Globe, Rocket, BarChart3, Layout, CheckCircle2, Bot } from 'lucide-react'
+import { ArrowRight, Cpu, Rocket, CheckCircle2, Bot } from 'lucide-react'
 import ChatBot from '@/components/ChatBot'
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
             </h1>
             
             <p style={{ color: '#94a3b8', fontSize: '1.1rem', maxWidth: '500px', lineHeight: '1.6', marginBottom: '40px' }}>
-              Desenvolvedor Full Stack especializado em Python, BI, Sites Web, Apps e Automações inteligentes.
+              Desenvolvedor Full Stack especializado em Python, APIs, Sites Web e Automações inteligentes.
             </p>
 
             <a href="https://wa.me/5519992278928" target="_blank" className="btn-glow">
@@ -77,7 +77,7 @@ export default function Home() {
 
           <div style={{ flex: '1', minWidth: '350px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <SkillBox title="Backend" items={["Python (APIs)", "Flask/Django", "JSON Data"]} />
-            <SkillBox title="Dados & BI" items={["Power BI", "Power Query", "Dashboards"]} />
+            <SkillBox title="Desenvolvimento" items={["Next.js", "React Native", "Websites"]} />
             <SkillBox title="Cloud" items={["Vercel/Render", "Git/Gitflow", "AWS Noções"]} />
             <SkillBox title="Engenharia" items={["Automações", "Arquitetura", "SaaS Models"]} />
           </div>
@@ -87,7 +87,7 @@ export default function Home() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '30px' }}>
           <ProjectCard title="TI Saúde" img="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&q=80" tag="Sistemas" url="https://ti-saude-frontend.vercel.app" />
           <ProjectCard title="Plataforma de Vendas" img="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&q=80" tag="SaaS / IA" url="https://meu-sistema-vendas.vercel.app" />
-          <ProjectCard title="Dashboard Actus" img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=80" tag="Power BI" url="https://prototipo-actus.vercel.app" />
+          <ProjectCard title="Plataforma Actus" img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&q=80" tag="Turismo & Comércio" url="https://prototipo-actus.vercel.app" />
         </div>
       </div>
 
@@ -98,7 +98,8 @@ export default function Home() {
           background: linear-gradient(90deg, #22d3ee, #3b82f6, #a855f7, #f472b6, #22d3ee);
           background-size: 300% auto;
           -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          -webkit-fill-color: transparent;
+          -webkit-background-clip: text;
           animation: colorShift 5s linear infinite;
         }
         @keyframes colorShift { to { background-position: 300% center; } }
@@ -156,4 +157,5 @@ function ProjectCard({ title, img, tag, url }: any) {
       </div>
     </div>
   )
-}
+            }
+                     

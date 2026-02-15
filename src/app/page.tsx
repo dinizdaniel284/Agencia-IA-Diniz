@@ -18,32 +18,67 @@ export default function Home() {
   const texts = {
     agency: locale === 'pt' ? 'AGÊNCIA DE INTELIGÊNCIA ARTIFICIAL' : 'AI AGENCY',
     title: locale === 'pt' ? 'SOLUÇÕES QUE ESCALAM NEGÓCIOS' : 'SOLUTIONS THAT SCALE BUSINESSES',
-    description: locale === 'pt' ? 'Desenvolvedor Full Stack especializado em Python, APIs e Automações que transformam empresas.' :
+    description: locale === 'pt' ? 
+      'Desenvolvedor Full Stack especializado em Python, APIs e Automações que transformam empresas.' : 
       'Full Stack Developer specialized in Python, APIs, and Automations that transform businesses.',
     btnProject: locale === 'pt' ? 'SOLICITAR PROJETO' : 'REQUEST PROJECT',
     projectsTitle: locale === 'pt' ? 'PROJETOS SELECIONADOS' : 'SELECTED PROJECTS',
+    consultant: locale === 'pt' ? 'CONSULTOR IA' : 'AI CONSULTANT'
   }
 
   return (
-    <main style={{ backgroundColor: '#020617', color: 'white', minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: 'sans-serif', overflowX: 'hidden', position: 'relative' }}>
+    <main style={{
+      backgroundColor: '#020617',
+      color: 'white', minHeight: '100vh', width: '100%',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      fontFamily: 'sans-serif', overflowX: 'hidden', position: 'relative',
+    }}>
       
       {/* Efeito de Luz */}
-      <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', width: '100%', height: '600px', background: 'radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15) 0%, transparent 70%)', zIndex: 1, pointerEvents: 'none' }}></div>
+      <div style={{
+        position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)',
+        width: '100%', height: '600px',
+        background: 'radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15) 0%, transparent 70%)',
+        zIndex: 1, pointerEvents: 'none'
+      }}></div>
 
       {/* NAV */}
-      <nav style={{ width: '100%', maxWidth: '1200px', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 15px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.03)' }}>
+      <nav style={{
+        width: '100%', maxWidth: '1200px', padding: '20px 40px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 100
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 15px',
+          borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundColor: 'rgba(255, 255, 255, 0.03)'
+        }}>
           <Cpu size={18} color="#22d3ee" />
           <span style={{ fontSize: '12px', fontWeight: 'bold', letterSpacing: '2px' }}>DANIEL DINIZ</span>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <button onClick={openChat} style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'white', padding: '10px 20px', borderRadius: '12px', border: 'none', color: '#020617', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>
+          <button 
+            onClick={openChat} 
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              backgroundColor: 'white', padding: '10px 20px', borderRadius: '12px',
+              border: 'none', color: '#020617', fontWeight: 'bold', cursor: 'pointer',
+              transition: '0.3s'
+            }}
+          >
             <Bot size={18} />
-            <span style={{ fontSize: '13px' }}>{locale === 'pt' ? 'CONSULTOR IA' : 'AI CONSULTANT'}</span>
+            <span style={{ fontSize: '13px' }}>{texts.consultant}</span>
           </button>
 
-          <button onClick={toggleLocale} style={{ padding: '10px 18px', borderRadius: '12px', backgroundColor: '#22d3ee', color: '#020617', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 0 15px #22d3ee', animation: 'pulse 2s infinite', transition: 'all 0.3s' }}>
+          {/* BOTÃO DE TROCA DE IDIOMA */}
+          <button 
+            onClick={toggleLocale} 
+            style={{
+              padding: '10px 18px', borderRadius: '12px', backgroundColor: '#22d3ee',
+              color: '#020617', fontWeight: 'bold', cursor: 'pointer',
+              boxShadow: '0 0 15px #22d3ee', animation: 'pulse 2s infinite', transition: 'all 0.3s'
+            }}
+          >
             {locale === 'pt' ? 'EN' : 'PT'}
           </button>
         </div>
@@ -53,7 +88,9 @@ export default function Home() {
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1250px', width: '100%', padding: '60px 40px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ flex: '1', minWidth: '320px', textAlign: 'left' }}>
-            <div style={{ color: '#22d3ee', fontSize: '11px', fontWeight: '900', marginBottom: '15px', letterSpacing: '2px' }}>{texts.agency}</div>
+            <div style={{ color: '#22d3ee', fontSize: '11px', fontWeight: '900', marginBottom: '15px', letterSpacing: '2px' }}>
+              {texts.agency}
+            </div>
 
             <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', fontWeight: '900', lineHeight: '1', marginBottom: '25px', letterSpacing: '-2px' }}>
               {texts.title}
@@ -111,6 +148,7 @@ function SkillBox({ title, items }: any) {
 }
 
 function ProjectCard({ title, img, tag, url }: any) {
+  const { locale } = useLanguage()
   return (
     <div style={{ borderRadius: '24px', overflow: 'hidden', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
       <img src={img} alt={title} style={{ width: '100%', height: '180px', objectFit: 'cover', opacity: '0.8' }} />
@@ -123,4 +161,4 @@ function ProjectCard({ title, img, tag, url }: any) {
       </div>
     </div>
   )
-            }
+      }

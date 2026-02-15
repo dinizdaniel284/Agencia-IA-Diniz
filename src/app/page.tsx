@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, Cpu, Bot, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Cpu, Bot } from 'lucide-react'
 import ChatBot from '@/components/ChatBot'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -10,9 +10,11 @@ export default function Home() {
   const { locale, toggleLocale } = useLanguage()
 
   useEffect(() => { setMounted(true) }, [])
-  if (!mounted) return null;
+  if (!mounted) return null
 
-  const openChat = () => { window.dispatchEvent(new Event('open-daniel-chat')); }
+  const openChat = () => {
+    window.dispatchEvent(new Event('open-daniel-chat'))
+  }
 
   const texts = {
     agency: locale === 'pt' ? 'AGÊNCIA DE INTELIGÊNCIA ARTIFICIAL' : 'AI AGENCY',
@@ -39,6 +41,7 @@ export default function Home() {
       position: 'relative',
     }}>
 
+      {/* Glow Background */}
       <div style={{
         position: 'absolute',
         top: '0',
@@ -49,8 +52,9 @@ export default function Home() {
         background: 'radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15) 0%, transparent 70%)',
         zIndex: 1,
         pointerEvents: 'none'
-      }}></div>
+      }} />
 
+      {/* NAV */}
       <nav style={{
         width: '100%',
         maxWidth: '1200px',
@@ -159,46 +163,42 @@ export default function Home() {
               {texts.description}
             </p>
 
-            <a href="https://wa.me/5519992278928" target="_blank" className="btn-premium">
+            <a
+              href="https://wa.me/5519992278928"
+              target="_blank"
+              className="btn-premium"
+            >
               {texts.btnProject} <ArrowRight size={20} />
             </a>
           </div>
-
-          <SkillGrid locale={locale} />
         </div>
 
-        {/* PROJECTS */}
-        <h2 style={{
-          marginTop: '100px',
-          marginBottom: '40px',
-          fontSize: '2rem',
-          fontWeight: '900'
-        }}>
-          {texts.projectsTitle}
-        </h2>
-
-        <ProjectGrid locale={locale} />
-
-        {/* GEO DIGITAL INFRASTRUCTURE */}
+        {/* GEO SECTION */}
         <GeoSection locale={locale} />
 
       </div>
 
       <ChatBot />
-
     </main>
   )
 }
 
-/* ================= COMPONENTS ================= */
+/* ================= GEO SECTION ================= */
 
 function GeoSection({ locale }: any) {
   const [city, setCity] = useState('')
   const [node, setNode] = useState<string | null>(null)
+  const [cubeLink, setCubeLink] = useState('')
+  const [linked, setLinked] = useState(false)
 
   const createNode = () => {
     if (!city) return
     setNode(city)
+  }
+
+  const connectCube = () => {
+    if (!cubeLink) return
+    setLinked(true)
   }
 
   return (
@@ -210,7 +210,9 @@ function GeoSection({ locale }: any) {
       border: '1px solid rgba(255,255,255,0.05)'
     }}>
       <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '20px' }}>
-        🌍 {locale === 'pt' ? 'Infraestrutura Digital Geolocalizada' : 'Geo Digital Infrastructure'}
+        🌍 {locale === 'pt'
+          ? 'Infraestrutura Digital Geolocalizada'
+          : 'Geo Digital Infrastructure'}
       </h2>
 
       <p style={{
@@ -256,17 +258,64 @@ function GeoSection({ locale }: any) {
       {node && (
         <div style={{
           marginTop: '30px',
-          padding: '20px',
+          padding: '25px',
           borderRadius: '16px',
           backgroundColor: 'rgba(34,211,238,0.05)',
           border: '1px solid rgba(34,211,238,0.2)'
         }}>
           <strong style={{ color: '#22d3ee' }}>Node Activated:</strong>
+
           <p style={{ marginTop: '10px', color: '#94a3b8' }}>
             Digital presence initialized for {node}. Cloud-ready • Scalable • API-integrated
           </p>
+
+          <div style={{
+            marginTop: '25px',
+            paddingTop: '20px',
+            borderTop: '1px solid rgba(255,255,255,0.08)'
+          }}>
+            <h4 style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+              🔗 Connect Cube Domain
+            </h4>
+
+            <input
+              value={cubeLink}
+              onChange={(e) => setCubeLink(e.target.value)}
+              placeholder="Paste your Cube public link here..."
+              style={{
+                width: '100%',
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: '#020617',
+                color: 'white',
+                marginBottom: '15px'
+              }}
+            />
+
+            <button
+              onClick={connectCube}
+              style={{
+                padding: '12px 25px',
+                borderRadius: '12px',
+                backgroundColor: linked ? '#16a34a' : '#22d3ee',
+                color: '#020617',
+                fontWeight: 'bold',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {linked ? 'Cube Linked ✓' : 'Link Cube'}
+            </button>
+
+            {linked && (
+              <p style={{ marginTop: '15px', color: '#22d3ee' }}>
+                Cube successfully connected to your digital node.
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
   )
-        }
+      }

@@ -1,17 +1,22 @@
 'use client'
+
 import { createContext, useContext, useState, ReactNode } from 'react'
 
-type LanguageContextType = {
+interface LanguageContextType {
   locale: 'pt' | 'en'
   toggleLocale: () => void
 }
 
 const LanguageContext = createContext<LanguageContextType>({
   locale: 'pt',
-  toggleLocale: () => {}
+  toggleLocale: () => {},
 })
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+interface LanguageProviderProps {
+  children: ReactNode
+}
+
+export function LanguageProvider({ children }: LanguageProviderProps) {
   const [locale, setLocale] = useState<'pt' | 'en'>('pt')
 
   const toggleLocale = () => {
@@ -25,4 +30,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export const useLanguage = () => useContext(LanguageContext)
+// Hook para usar facilmente
+export function useLanguage() {
+  return useContext(LanguageContext)
+}

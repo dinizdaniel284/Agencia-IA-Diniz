@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import { cn } from '@/lib/utils'
+import { LanguageProvider } from '@/context/LanguageContext'  // Import do Provider
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -44,7 +45,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-900/20 blur-[150px] rounded-full" />
         </div>
 
-        {children}
+        {/* ENVOLVENDO O APP COM LANGUAGE PROVIDER */}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
 
       </body>
     </html>

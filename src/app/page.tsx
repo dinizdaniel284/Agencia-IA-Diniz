@@ -1,6 +1,5 @@
 'use client'
 
-// 1. Força o Next.js a não pré-renderizar estaticamente no build (evita erro de variáveis ausentes)
 export const dynamic = 'force-dynamic'
 
 import React, { useEffect, useState } from 'react'
@@ -29,7 +28,20 @@ const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup)
 
 import 'leaflet/dist/leaflet.css'
 
-// Supabase Client com Proteção contra Build Fail
+// Subcomponente para forçar o mapa a se mover (Redirecionamento)
+// Colocamos fora do Home para não ser recriado toda hora
+function ChangeView({ center }: { center: [number, number] }) {
+  const { useMap } = require('react-leaflet');
+  const map = useMap();
+  useEffect(() => {
+    if (center[0] !== 0 || center[1] !== 0) {
+      map.setView(center, 12, { animate: true });
+    }
+  }, [center, map]);
+  return null;
+}
+
+// Supabase Client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
@@ -63,9 +75,7 @@ export default function Home() {
   }
 
   const fetchNodes = async () => {
-    // Só tenta buscar se a URL não for o placeholder
     if (supabaseUrl.includes('placeholder')) return
-    
     const { data, error } = await supabase.from('digital_nodes').select('*')
     if (!error && data) setNodes(data)
   }
@@ -78,10 +88,11 @@ export default function Home() {
     }
     navigator.geolocation.getCurrentPosition(async (position) => {
       const { latitude, longitude } = position.coords
-      const { data, error } = await supabase.from('digital_nodes').insert([
+      const { error } = await supabase.from('digital_nodes').insert([
         { city, latitude, longitude, type: typeFilter },
       ])
       if (!error) {
+        // Isso aqui vai disparar o ChangeView dentro do MapContainer
         setUserNode({ city, latitude, longitude, type: typeFilter })
         fetchNodes()
       }
@@ -165,6 +176,10 @@ export default function Home() {
           <div style={{ height: '400px', borderRadius: '16px', overflow: 'hidden' }}>
             <MapContainer center={defaultCenter} zoom={2} style={{ height: '100%', width: '100%' }}>
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              
+              {/* COMPONENTE QUE FAZ O REDIRECIONAMENTO */}
+              {userNode && <ChangeView center={[userNode.latitude, userNode.longitude]} />}
+
               {filteredNodes.map(node => (
                 <Marker key={node.id} position={[node.latitude, node.longitude]}>
                   <Popup>{node.city}</Popup>

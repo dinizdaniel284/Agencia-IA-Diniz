@@ -9,10 +9,11 @@ import { useLanguage } from '@/context/LanguageContext'
 import { createClient } from '@supabase/supabase-js'
 import dynamicImport from 'next/dynamic'
 
-const MapContainer = dynamicImport(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false }) as React.ComponentType<any>;
-const TileLayer = dynamicImport(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false }) as React.ComponentType<any>;
-const Marker = dynamicImport(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false }) as React.ComponentType<any>;
-const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false }) as React.ComponentType<any>;
+// Importação dinâmica protegida
+const MapContainer = dynamicImport(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false });
+const TileLayer = dynamicImport(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false });
+const Marker = dynamicImport(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false });
+const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false });
 
 import 'leaflet/dist/leaflet.css'
 
@@ -33,29 +34,42 @@ export default function Home() {
   useEffect(() => {
     setMounted(true)
     fetchNodes()
-    const L = require('leaflet')
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    })
+    // Só carrega o Leaflet no cliente
+    if (typeof window !== 'undefined') {
+      const L = require('leaflet')
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+      })
+    }
   }, [])
 
   const fetchNodes = async () => {
-    if (supabaseUrl.includes('placeholder')) return
-    const { data, error } = await supabase.from('nodes_sistema').select('*')
-    if (!error && data) setNodes(data)
+    try {
+      if (supabaseUrl.includes('placeholder')) return
+      const { data, error } = await supabase.from('nodes_sistema').select('*')
+      if (!error && data) setNodes(data)
+    } catch (e) {
+      console.error("Erro ao buscar nós:", e)
+    }
   }
 
   const createNode = () => {
-    if (!city) { alert("Digite o nome da cidade!"); return; }
+    console.log("DEBUG: Botão Criar Nó pressionado!"); // Isso TEM que aparecer no F12
+    
+    if (!city) { 
+      alert("Por favor, digite o nome da cidade primeiro."); 
+      return; 
+    }
 
-    if (navigator.geolocation) {
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      console.log("DEBUG: Solicitando GPS...");
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
+        console.log("DEBUG: GPS capturado:", latitude, longitude);
         
-        // Faz o mapa "viajar" para a localização com zoom
         if (mapRef.current) {
           mapRef.current.setView([latitude, longitude], 13, { animate: true });
         }
@@ -65,19 +79,23 @@ export default function Home() {
         ]);
 
         if (!error) {
-          setCity(''); // Limpa o input
-          fetchNodes(); // Atualiza os marcadores
+          console.log("DEBUG: Nó salvo com sucesso!");
+          setCity('');
+          fetchNodes();
         } else {
           console.error("Erro Supabase:", error.message);
+          alert("Erro no banco: " + error.message);
         }
       }, (err) => {
-        alert("Erro de permissão ou GPS: " + err.message);
+        console.error("Erro GPS:", err.message);
+        alert("Erro de GPS: " + err.message + ". Verifique se permitiu a localização.");
       }, { enableHighAccuracy: true, timeout: 10000 });
     } else {
-      alert("Seu navegador não suporta geolocalização.");
+      alert("Geolocalização não suportada neste navegador.");
     }
   }
 
+  // ... (restante dos objetos texts e projects iguais ao seu)
   const texts = {
     agency: locale === 'pt' ? 'AGÊNCIA DE INTELIGÊNCIA ARTIFICIAL' : 'AI AGENCY',
     title: locale === 'pt' ? 'SOLUÇÕES QUE ESCALAM NEGÓCIOS' : 'SOLUTIONS THAT SCALE BUSINESSES',
@@ -138,23 +156,25 @@ export default function Home() {
           <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '20px' }}>🌍 Infraestrutura Digital</h2>
           <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
             <input value={city} onChange={e => setCity(e.target.value)} placeholder="Sua cidade..." style={inputStyle} />
-            <button onClick={createNode} style={btnStyle}>Criar Nó Digital</button>
+            <button onClick={() => createNode()} style={btnStyle}>Criar Nó Digital</button>
           </div>
           
           <div style={{ height: '450px', borderRadius: '16px', overflow: 'hidden', border: '2px solid #22d3ee' }}>
-            <MapContainer 
-              center={[20, 0]} // COMEÇA COM VISÃO GLOBAL (Brasil e Europa visíveis)
-              zoom={2} 
-              style={{ height: '100%', width: '100%' }}
-              ref={mapRef}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {nodes.map((node: any, idx: number) => (
-                <Marker key={idx} position={[node.latitude, node.longitude]}>
-                  <Popup>{node.city}</Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+            {mounted && (
+              <MapContainer 
+                center={[20, 0]} 
+                zoom={2} 
+                style={{ height: '100%', width: '100%' }}
+                ref={mapRef}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                {nodes.map((node: any, idx: number) => (
+                  <Marker key={idx} position={[node.latitude, node.longitude]}>
+                    <Popup>{node.city}</Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            )}
           </div>
         </div>
       </div>
@@ -163,31 +183,32 @@ export default function Home() {
   )
 }
 
+// ... rest of the helper components (SkillBox, ProjectCard, styles)
 function SkillBox({ title, items }: any) {
-  return (
-    <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px' }}>
-      <h3 style={{ fontSize: '0.8rem', color: '#22d3ee', marginBottom: '10px', fontWeight: '900' }}>{title}</h3>
-      {items.map((item: any) => (
-        <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
-          <CheckCircle2 size={12} color="#22d3ee" /> {item}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ProjectCard({ title, img, tag, url }: any) {
-  return (
-    <div style={{ borderRadius: '24px', overflow: 'hidden', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
-      <img src={img} alt={title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
-      <div style={{ padding: '20px' }}>
-        <span style={{ fontSize: '10px', color: '#22d3ee', fontWeight: 'bold' }}>{tag}</span>
-        <h3 style={{ fontSize: '1.1rem', marginTop: '5px', fontWeight: 'bold', marginBottom: '15px' }}>{title}</h3>
-        <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 15px', borderRadius: '8px' }}>Ver Projeto</a>
+    return (
+      <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px' }}>
+        <h3 style={{ fontSize: '0.8rem', color: '#22d3ee', marginBottom: '10px', fontWeight: '900' }}>{title}</h3>
+        {items.map((item: any) => (
+          <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
+            <CheckCircle2 size={12} color="#22d3ee" /> {item}
+          </div>
+        ))}
       </div>
-    </div>
-  )
-}
-
-const btnStyle: React.CSSProperties = { padding: '12px 25px', borderRadius: '12px', backgroundColor: '#22d3ee', color: '#020617', fontWeight: 'bold', border: 'none', cursor: 'pointer' }
-const inputStyle: React.CSSProperties = { padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#020617', color: 'white', flex: 1 }
+    )
+  }
+  
+  function ProjectCard({ title, img, tag, url }: any) {
+    return (
+      <div style={{ borderRadius: '24px', overflow: 'hidden', backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <img src={img} alt={title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+        <div style={{ padding: '20px' }}>
+          <span style={{ fontSize: '10px', color: '#22d3ee', fontWeight: 'bold' }}>{tag}</span>
+          <h3 style={{ fontSize: '1.1rem', marginTop: '5px', fontWeight: 'bold', marginBottom: '15px' }}>{title}</h3>
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.1)', padding: '8px 15px', borderRadius: '8px' }}>Ver Projeto</a>
+        </div>
+      </div>
+    )
+  }
+  
+  const btnStyle: React.CSSProperties = { padding: '12px 25px', borderRadius: '12px', backgroundColor: '#22d3ee', color: '#020617', fontWeight: 'bold', border: 'none', cursor: 'pointer' }
+  const inputStyle: React.CSSProperties = { padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#020617', color: 'white', flex: 1 }

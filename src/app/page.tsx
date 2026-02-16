@@ -16,8 +16,11 @@ const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup)
 
 import 'leaflet/dist/leaflet.css'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+// --- AJUSTE DE URL DO SUPABASE ---
+const rawUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'placeholder').trim();
+const supabaseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder').trim();
+
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function Home() {
@@ -26,10 +29,7 @@ export default function Home() {
   const [city, setCity] = useState('')
   const [nodes, setNodes] = useState<any[]>([])
   const [userNode, setUserNode] = useState<any | null>(null)
-  const [filter, setFilter] = useState<'global' | 'local' | 'type'>('global')
-  const [typeFilter, setTypeFilter] = useState<string>('All')
   
-  // Ref para controlar o mapa diretamente
   const mapRef = useRef<any>(null)
 
   useEffect(() => {
@@ -51,36 +51,37 @@ export default function Home() {
   }
 
   const createNode = () => {
-    console.log("Botão clicado!"); // Para você ver no F12 se está disparando
+    console.log("Iniciando criação de nó na Agência IA Diniz...");
     if (!city) { alert("Digite o nome da cidade!"); return; }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         
-        // 1. Move o mapa imediatamente
+        // 1. Move o mapa imediatamente com o ref
         if (mapRef.current) {
-          mapRef.current.setView([latitude, longitude], 13);
+          mapRef.current.setView([latitude, longitude], 13, { animate: true });
         }
 
         // 2. Salva no banco
         const { error } = await supabase.from('digital_nodes').insert([
-          { city, latitude, longitude, type: typeFilter },
+          { city, latitude, longitude, type: 'AI Node' },
         ]);
 
         if (!error) {
-          setUserNode({ city, latitude, longitude, type: typeFilter });
+          setUserNode({ city, latitude, longitude });
           fetchNodes();
+        } else {
+          console.error("Erro Supabase:", error.message);
         }
       }, (err) => {
-        alert("Erro ao pegar localização: " + err.message);
-      }, { enableHighAccuracy: true });
+        alert("Erro de permissão ou GPS: " + err.message);
+      }, { enableHighAccuracy: true, timeout: 10000 });
     } else {
-      alert("Geolocalização não suportada");
+      alert("Seu navegador não suporta geolocalização.");
     }
   }
 
-  // --- RESTO DOS TEXTOS E COMPONENTES (IGUAL AO SEU) ---
   const texts = {
     agency: locale === 'pt' ? 'AGÊNCIA DE INTELIGÊNCIA ARTIFICIAL' : 'AI AGENCY',
     title: locale === 'pt' ? 'SOLUÇÕES QUE ESCALAM NEGÓCIOS' : 'SOLUTIONS THAT SCALE BUSINESSES',
@@ -100,7 +101,8 @@ export default function Home() {
 
   return (
     <main style={{ backgroundColor: '#020617', color: 'white', minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: 'sans-serif', overflowX: 'hidden', position: 'relative' }}>
-      {/* ... (Nav e Hero IGUAIS) ... */}
+      <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', height: '600px', background: 'radial-gradient(circle at 50% -20%, rgba(34, 211, 238, 0.15) 0%, transparent 70%)', zIndex: 1, pointerEvents: 'none' }}></div>
+
       <nav style={{ width: '100%', maxWidth: '1200px', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.03)' }}>
           <Cpu size={18} color="#22d3ee" />
@@ -116,7 +118,6 @@ export default function Home() {
       </nav>
 
       <div style={{ position: 'relative', zIndex: 10, maxWidth: '1250px', width: '100%', padding: '60px 40px' }}>
-        {/* ... Hero Content e SkillBox ... */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ flex: '1', minWidth: '320px' }}>
             <div style={{ color: '#22d3ee', fontSize: '11px', fontWeight: '900', marginBottom: '15px', letterSpacing: '2px' }}>{texts.agency}</div>
@@ -132,13 +133,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* PROJETOS */}
         <h2 style={{ marginTop: '100px', marginBottom: '40px', fontSize: '2rem', fontWeight: '900' }}>{texts.projectsTitle}</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: '25px' }}>
           {projects.map(p => <ProjectCard key={p.title} {...p} />)}
         </div>
 
-        {/* MAPA SEÇÃO */}
         <div style={{ marginTop: '120px', padding: '50px', borderRadius: '24px', backgroundColor: '#0b1120', border: '1px solid rgba(255,255,255,0.05)' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '20px' }}>🌍 Infraestrutura Digital</h2>
           <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
@@ -151,7 +150,7 @@ export default function Home() {
               center={[0, 0]} 
               zoom={2} 
               style={{ height: '100%', width: '100%' }}
-              ref={mapRef} // AQUI ESTÁ O SEGREDO
+              ref={mapRef}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {nodes.map(node => (
@@ -168,7 +167,6 @@ export default function Home() {
   )
 }
 
-// COMPONENTES AUXILIARES (SkillBox, ProjectCard e estilos mantidos)
 function SkillBox({ title, items }: any) {
   return (
     <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px' }}>

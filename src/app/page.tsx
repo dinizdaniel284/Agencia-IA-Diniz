@@ -9,18 +9,27 @@ import { useLanguage } from '@/context/LanguageContext'
 import { createClient } from '@supabase/supabase-js'
 import dynamicImport from 'next/dynamic'
 
-// Importações dinâmicas com tipagem 'any' para silenciar o TypeScript e passar no build
+// Importações dinâmicas
 const MapContainer = dynamicImport(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false }) as React.ComponentType<any>;
 const TileLayer = dynamicImport(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false }) as React.ComponentType<any>;
 const Marker = dynamicImport(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false }) as React.ComponentType<any>;
 const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup), { ssr: false }) as React.ComponentType<any>;
+const useMap = () => require('react-leaflet').useMap();
 
 import 'leaflet/dist/leaflet.css'
+
+// Componente auxiliar para forçar o movimento do mapa
+function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom, { animate: true });
+  }, [center, zoom]);
+  return null;
+}
 
 const rawUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'placeholder').trim();
 const supabaseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
 const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder').trim();
-
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export default function Home() {
@@ -29,12 +38,13 @@ export default function Home() {
   const [city, setCity] = useState('')
   const [nodes, setNodes] = useState<any[]>([])
   
-  const mapRef = useRef<any>(null)
+  // Estados para controlar a câmera do mapa
+  const [mapCenter, setMapCenter] = useState<[number, number]>([20, 0]);
+  const [mapZoom, setMapZoom] = useState(2);
 
   useEffect(() => {
     setMounted(true)
     fetchNodes()
-    
     if (typeof window !== 'undefined') {
       const L = require('leaflet')
       delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -51,27 +61,19 @@ export default function Home() {
       if (supabaseUrl.includes('placeholder')) return
       const { data, error } = await supabase.from('nodes_sistema').select('*')
       if (!error && data) setNodes(data)
-    } catch (e) {
-      console.error("Erro ao buscar nós:", e)
-    }
+    } catch (e) { console.error(e) }
   }
 
   const createNode = () => {
-    console.log("DEBUG: Botão acionado!");
-    
-    if (!city) { 
-      alert("Digite o nome da cidade!"); 
-      return; 
-    }
+    if (!city) { alert("Digite a cidade!"); return; }
 
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
-        console.log("DEBUG: GPS OK ->", latitude, longitude);
         
-        if (mapRef.current) {
-          mapRef.current.setView([latitude, longitude], 13, { animate: true });
-        }
+        // ATUALIZA O ESTADO -> ISSO MOVE O MAPA
+        setMapCenter([latitude, longitude]);
+        setMapZoom(13);
 
         const { error } = await supabase.from('nodes_sistema').insert([
           { city, latitude, longitude, type: 'AI Node' },
@@ -80,12 +82,8 @@ export default function Home() {
         if (!error) {
           setCity('');
           fetchNodes();
-        } else {
-          console.error("Erro no banco:", error.message);
         }
-      }, (err) => {
-        alert("Erro de GPS: " + err.message);
-      }, { enableHighAccuracy: true, timeout: 10000 });
+      }, (err) => alert(err.message));
     }
   }
 
@@ -155,11 +153,11 @@ export default function Home() {
           <div style={{ height: '450px', borderRadius: '16px', overflow: 'hidden', border: '2px solid #22d3ee' }}>
             {mounted && (
               <MapContainer 
-                center={[20, 0]} 
-                zoom={2} 
+                center={mapCenter} 
+                zoom={mapZoom} 
                 style={{ height: '100%', width: '100%' }}
-                ref={mapRef}
               >
+                <ChangeView center={mapCenter} zoom={mapZoom} />
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {nodes.map((node: any, idx: number) => (
                   <Marker key={idx} position={[node.latitude, node.longitude]}>

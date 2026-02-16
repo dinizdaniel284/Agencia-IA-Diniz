@@ -16,7 +16,6 @@ const Popup = dynamicImport(() => import('react-leaflet').then(mod => mod.Popup)
 
 import 'leaflet/dist/leaflet.css'
 
-// --- AJUSTE DE URL DO SUPABASE ---
 const rawUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'placeholder').trim();
 const supabaseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
 const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder').trim();
@@ -28,7 +27,6 @@ export default function Home() {
   const { locale, toggleLocale } = useLanguage()
   const [city, setCity] = useState('')
   const [nodes, setNodes] = useState<any[]>([])
-  const [userNode, setUserNode] = useState<any | null>(null)
   
   const mapRef = useRef<any>(null)
 
@@ -46,34 +44,31 @@ export default function Home() {
 
   const fetchNodes = async () => {
     if (supabaseUrl.includes('placeholder')) return
-    // ALTERADO PARA A NOVA TABELA nodes_sistema
     const { data, error } = await supabase.from('nodes_sistema').select('*')
     if (!error && data) setNodes(data)
   }
 
   const createNode = () => {
-    console.log("Iniciando criação de nó na Agência IA Diniz...");
     if (!city) { alert("Digite o nome da cidade!"); return; }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         
+        // Faz o mapa "viajar" para a localização com zoom
         if (mapRef.current) {
           mapRef.current.setView([latitude, longitude], 13, { animate: true });
         }
 
-        // ALTERADO PARA A NOVA TABELA nodes_sistema
         const { error } = await supabase.from('nodes_sistema').insert([
           { city, latitude, longitude, type: 'AI Node' },
         ]);
 
         if (!error) {
-          setUserNode({ city, latitude, longitude });
-          fetchNodes();
+          setCity(''); // Limpa o input
+          fetchNodes(); // Atualiza os marcadores
         } else {
           console.error("Erro Supabase:", error.message);
-          alert("Erro ao salvar: " + error.message);
         }
       }, (err) => {
         alert("Erro de permissão ou GPS: " + err.message);
@@ -148,14 +143,14 @@ export default function Home() {
           
           <div style={{ height: '450px', borderRadius: '16px', overflow: 'hidden', border: '2px solid #22d3ee' }}>
             <MapContainer 
-              center={[0, 0]} 
+              center={[20, 0]} // COMEÇA COM VISÃO GLOBAL (Brasil e Europa visíveis)
               zoom={2} 
               style={{ height: '100%', width: '100%' }}
               ref={mapRef}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {nodes.map(node => (
-                <Marker key={node.id} position={[node.latitude, node.longitude]}>
+              {nodes.map((node: any, idx: number) => (
+                <Marker key={idx} position={[node.latitude, node.longitude]}>
                   <Popup>{node.city}</Popup>
                 </Marker>
               ))}

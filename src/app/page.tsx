@@ -38,7 +38,6 @@ export default function Home() {
   const [city, setCity] = useState('')
   const [nodes, setNodes] = useState<any[]>([])
   
-  // Estados para controlar a câmera do mapa
   const [mapCenter, setMapCenter] = useState<[number, number]>([20, 0]);
   const [mapZoom, setMapZoom] = useState(2);
 
@@ -64,26 +63,40 @@ export default function Home() {
     } catch (e) { console.error(e) }
   }
 
-  const createNode = () => {
-    if (!city) { alert("Digite a cidade!"); return; }
+  // NOVA FUNÇÃO: VIAJAR PARA A CIDADE
+  const createNode = async () => {
+    if (!city) { alert("Digite o nome de uma cidade!"); return; }
 
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
-        
-        // ATUALIZA O ESTADO -> ISSO MOVE O MAPA
+    try {
+      // Busca as coordenadas pelo nome (Geocoding)
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
+      const data = await res.json();
+
+      if (data && data.length > 0) {
+        const latitude = parseFloat(data[0].lat);
+        const longitude = parseFloat(data[0].lon);
+        const cityName = data[0].display_name.split(',')[0]; // Nome curto da cidade
+
+        // FAZ O MAPA VOAR PARA O DESTINO
         setMapCenter([latitude, longitude]);
-        setMapZoom(13);
+        setMapZoom(12);
 
+        // SALVA NO SUPABASE
         const { error } = await supabase.from('nodes_sistema').insert([
-          { city, latitude, longitude, type: 'AI Node' },
+          { city: cityName, latitude, longitude, type: 'AI Node' },
         ]);
 
         if (!error) {
           setCity('');
           fetchNodes();
+        } else {
+          console.error("Erro banco:", error.message);
         }
-      }, (err) => alert(err.message));
+      } else {
+        alert("Cidade não encontrada no mapa global!");
+      }
+    } catch (err) {
+      alert("Erro na busca. Tente novamente.");
     }
   }
 
@@ -146,7 +159,7 @@ export default function Home() {
         <div style={{ marginTop: '120px', padding: '50px', borderRadius: '24px', backgroundColor: '#0b1120', border: '1px solid rgba(255,255,255,0.05)' }}>
           <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '20px' }}>🌍 Infraestrutura Digital</h2>
           <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
-            <input value={city} onChange={e => setCity(e.target.value)} placeholder="Sua cidade..." style={inputStyle} />
+            <input value={city} onChange={e => setCity(e.target.value)} placeholder="Digite qualquer cidade do mundo..." style={inputStyle} />
             <button onClick={createNode} style={btnStyle}>Criar Nó Digital</button>
           </div>
           

@@ -46,7 +46,8 @@ export default function Home() {
 
   const fetchNodes = async () => {
     if (supabaseUrl.includes('placeholder')) return
-    const { data, error } = await supabase.from('digital_nodes').select('*')
+    // ALTERADO PARA A NOVA TABELA nodes_sistema
+    const { data, error } = await supabase.from('nodes_sistema').select('*')
     if (!error && data) setNodes(data)
   }
 
@@ -58,13 +59,12 @@ export default function Home() {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         
-        // 1. Move o mapa imediatamente com o ref
         if (mapRef.current) {
           mapRef.current.setView([latitude, longitude], 13, { animate: true });
         }
 
-        // 2. Salva no banco
-        const { error } = await supabase.from('digital_nodes').insert([
+        // ALTERADO PARA A NOVA TABELA nodes_sistema
+        const { error } = await supabase.from('nodes_sistema').insert([
           { city, latitude, longitude, type: 'AI Node' },
         ]);
 
@@ -73,6 +73,7 @@ export default function Home() {
           fetchNodes();
         } else {
           console.error("Erro Supabase:", error.message);
+          alert("Erro ao salvar: " + error.message);
         }
       }, (err) => {
         alert("Erro de permissão ou GPS: " + err.message);

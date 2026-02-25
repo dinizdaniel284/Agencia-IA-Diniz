@@ -3,18 +3,35 @@
 export const dynamic = 'force-dynamic'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, Cpu, Bot, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Cpu, Bot } from 'lucide-react'
 import ChatBot from '@/components/ChatBot'
 import { useLanguage } from '@/context/LanguageContext'
 import { createClient } from '@supabase/supabase-js'
 import dynamicImport from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 
+type LatLngTuple = [number, number]
+
 // MAPA (SSR SAFE)
-const MapContainer = dynamicImport(() => import('react-leaflet').then(m => m.MapContainer), { ssr: false })
-const TileLayer = dynamicImport(() => import('react-leaflet').then(m => m.TileLayer), { ssr: false })
-const Marker = dynamicImport(() => import('react-leaflet').then(m => m.Marker), { ssr: false })
-const Popup = dynamicImport(() => import('react-leaflet').then(m => m.Popup), { ssr: false })
+const MapContainer: any = dynamicImport(
+  () => import('react-leaflet').then((m) => m.MapContainer),
+  { ssr: false }
+)
+
+const TileLayer: any = dynamicImport(
+  () => import('react-leaflet').then((m) => m.TileLayer),
+  { ssr: false }
+)
+
+const Marker: any = dynamicImport(
+  () => import('react-leaflet').then((m) => m.Marker),
+  { ssr: false }
+)
+
+const Popup: any = dynamicImport(
+  () => import('react-leaflet').then((m) => m.Popup),
+  { ssr: false }
+)
 
 const rawUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim()
 const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').trim()
@@ -32,7 +49,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [city, setCity] = useState('')
   const [nodes, setNodes] = useState<any[]>([])
-  const [mapCenter, setMapCenter] = useState<[number, number]>([20, 0])
+  const [mapCenter, setMapCenter] = useState<LatLngTuple>([20, 0])
   const [mapZoom, setMapZoom] = useState(2)
 
   useEffect(() => {
@@ -119,7 +136,7 @@ export default function Home() {
 
     description:
       locale === 'pt'
-        ? 'Desenvolvo sistemas web, integrações com APIs, automações e inteligência artificial para empresas que querem crescer com tecnologia.'
+        ? 'Desenvolvo sistemas web, integrações com APIs, automações e inteligência artificial para empresas.'
         : 'I build web systems, API integrations and AI automations for companies.',
 
     btnProject:
@@ -187,7 +204,6 @@ export default function Home() {
 
       <section style={heroStyle}>
         <h1>{texts.title}</h1>
-
         <p>{texts.description}</p>
 
         <a
@@ -202,25 +218,10 @@ export default function Home() {
         <h2 style={sectionTitle}>SERVIÇOS</h2>
 
         <div style={servicesGrid}>
-          <Service
-            title="Automação"
-            text="Automatização de tarefas e processos empresariais."
-          />
-
-          <Service
-            title="Integrações"
-            text="Integração entre APIs, sistemas e plataformas."
-          />
-
-          <Service
-            title="Inteligência Artificial"
-            text="Chatbots e automações inteligentes."
-          />
-
-          <Service
-            title="Sistemas Web"
-            text="Dashboards, plataformas e SaaS."
-          />
+          <Service title="Automação" text="Automação de processos empresariais." />
+          <Service title="Integrações" text="Integração entre APIs e sistemas." />
+          <Service title="IA" text="Chatbots e automações inteligentes." />
+          <Service title="Sistemas Web" text="Dashboards, SaaS e plataformas." />
         </div>
       </section>
 
@@ -251,7 +252,7 @@ export default function Home() {
         </div>
 
         <div style={mapStyle}>
-          <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%' }}>
+          <MapContainer center={mapCenter as any} zoom={mapZoom} style={{ height: '100%' }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
             {nodes.map((node: any, i) => (
@@ -387,4 +388,4 @@ const inputStyle = {
   flex: 1,
   padding: 10,
   borderRadius: 8,
-}
+  }

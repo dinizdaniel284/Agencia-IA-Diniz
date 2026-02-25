@@ -74,7 +74,6 @@ export default function Home() {
 
   async function fetchNodes() {
     if (!supabase) return
-
     try {
       const { data } = await supabase.from('nodes_sistema').select('*')
       if (data) setNodes(data)
@@ -131,23 +130,23 @@ export default function Home() {
 
     title:
       locale === 'pt'
-        ? 'SISTEMAS, AUTOMAÇÕES E IA PARA EMPRESAS'
-        : 'SYSTEMS AND AI FOR BUSINESSES',
+        ? 'Transformo processos manuais em sistemas inteligentes'
+        : 'Turning manual processes into intelligent systems',
 
     description:
       locale === 'pt'
-        ? 'Desenvolvo sistemas web, integrações com APIs, automações e inteligência artificial para empresas.'
-        : 'I build web systems, API integrations and AI automations for companies.',
+        ? 'Ajudo empresas a economizar tempo, reduzir erros e crescer usando automações, sistemas web e inteligência artificial.'
+        : 'I help companies automate operations and scale using AI and modern systems.',
 
     btnProject:
       locale === 'pt'
-        ? 'FALAR SOBRE PROJETO'
-        : 'START PROJECT',
+        ? 'Receber diagnóstico gratuito'
+        : 'Get free diagnosis',
 
     projectsTitle:
       locale === 'pt'
-        ? 'PROJETOS'
-        : 'PROJECTS',
+        ? 'Projetos Desenvolvidos'
+        : 'Projects',
 
     consultant:
       locale === 'pt'
@@ -204,7 +203,14 @@ export default function Home() {
 
       <section style={heroStyle}>
         <h1>{texts.title}</h1>
-        <p>{texts.description}</p>
+
+        <p style={{ fontSize: 18, opacity: 0.9 }}>
+          {texts.description}
+        </p>
+
+        <p style={{ marginTop: 10, opacity: 0.7 }}>
+          Automação • Sistemas Web • Integração de APIs • Inteligência Artificial
+        </p>
 
         <a
           href="https://wa.me/5519992278928?text=Olá vim pelo site"
@@ -215,13 +221,28 @@ export default function Home() {
       </section>
 
       <section style={{ maxWidth: 1200, width: '100%' }}>
-        <h2 style={sectionTitle}>SERVIÇOS</h2>
+        <h2 style={sectionTitle}>O que posso construir para sua empresa</h2>
 
         <div style={servicesGrid}>
-          <Service title="Automação" text="Automação de processos empresariais." />
-          <Service title="Integrações" text="Integração entre APIs e sistemas." />
-          <Service title="IA" text="Chatbots e automações inteligentes." />
-          <Service title="Sistemas Web" text="Dashboards, SaaS e plataformas." />
+          <Service
+            title="Automação de Processos"
+            text="Elimine tarefas repetitivas e ganhe produtividade."
+          />
+
+          <Service
+            title="Integração de Sistemas"
+            text="Conecte CRM, ERP, WhatsApp, APIs e plataformas."
+          />
+
+          <Service
+            title="Inteligência Artificial"
+            text="Atendimento automático, análise de dados e automações inteligentes."
+          />
+
+          <Service
+            title="Sistemas Web"
+            text="Plataformas, dashboards e sistemas sob medida."
+          />
         </div>
       </section>
 
@@ -236,9 +257,13 @@ export default function Home() {
       </section>
 
       <section style={mapBox}>
-        <h2 style={sectionTitle}>Infraestrutura Digital</h2>
+        <h2 style={sectionTitle}>Rede de Sistemas Criados</h2>
 
-        <div style={{ display: 'flex', gap: 10 }}>
+        <p style={{ opacity: 0.7 }}>
+          Cada ponto representa uma cidade onde um sistema ou automação pode operar.
+        </p>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 15 }}>
           <input
             style={inputStyle}
             placeholder="Digite uma cidade..."
@@ -324,14 +349,15 @@ const heroStyle = {
 }
 
 const ctaStyle = {
-  marginTop: 20,
+  marginTop: 25,
   display: 'inline-flex',
   gap: 8,
   background: '#22d3ee',
-  padding: '12px 20px',
+  padding: '14px 24px',
   borderRadius: 10,
   color: '#000',
   textDecoration: 'none',
+  fontWeight: 'bold',
 }
 
 const sectionTitle = {
@@ -388,4 +414,4 @@ const inputStyle = {
   flex: 1,
   padding: 10,
   borderRadius: 8,
-  }
+    }

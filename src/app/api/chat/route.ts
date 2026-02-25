@@ -1,71 +1,128 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
+  try {
 
-try {
+    const body = await req.json();
+    const messages = body.messages || [];
 
-const { messages } = await req.json();
+    const lastMessage =
+      messages.length > 0
+        ? String(messages[messages.length - 1].content).toLowerCase()
+        : "";
 
-const lastMessage = messages[messages.length - 1].content.toLowerCase();
+    const meuWhats = "https://wa.me/5519992278928";
 
-const meuWhats = "https://wa.me/5519992278928"; 
+    let responseText = "";
 
+    // AUTOMAÇÃO
+    if (
+      lastMessage.includes("automação") ||
+      lastMessage.includes("automatizar") ||
+      lastMessage.includes("n8n") ||
+      lastMessage.includes("bot")
+    ) {
+      responseText =
+        `Automação é uma das coisas que mais gera resultado hoje.
 
+Posso criar sistemas que trabalham por você 24h:
+• atendimento automático
+• integração com WhatsApp
+• processos rodando sozinhos
 
-let responseText = "";
+Se quiser ver como isso funcionaria no seu negócio:
+${meuWhats}`;
+    }
 
+    // SITE / APP
+    else if (
+      lastMessage.includes("site") ||
+      lastMessage.includes("app") ||
+      lastMessage.includes("aplicativo") ||
+      lastMessage.includes("web")
+    ) {
+      responseText =
+        `Eu desenvolvo sites modernos focados em gerar clientes.
 
+Não é só design bonito.
+É pensado para:
+• converter visitantes
+• carregar rápido
+• funcionar perfeito no celular
 
-// Lógica de triagem por palavras-chave
+Se quiser posso te mostrar exemplos:
+${meuWhats}`;
+    }
 
-if (lastMessage.includes("automação") || lastMessage.includes("automatizar") || lastMessage.includes("n8n") || lastMessage.includes("bot")) {
+    // PREÇO
+    else if (
+      lastMessage.includes("valor") ||
+      lastMessage.includes("preço") ||
+      lastMessage.includes("quanto") ||
+      lastMessage.includes("custo")
+    ) {
+      responseText =
+        `Os valores dependem do tipo de projeto.
 
-  responseText = `Automação é um dos meus focos! Desenvolvo fluxos inteligentes com n8n e Python para otimizar processos e ganhar escala. Vamos automatizar seu negócio? Fale comigo: ${meuWhats}`;
+Alguns são mais simples e outros envolvem automações ou integrações.
 
-}
+Se me explicar rapidamente o que você precisa consigo te passar uma ideia de investimento:
+${meuWhats}`;
+    }
 
-else if (lastMessage.includes("site") || lastMessage.includes("app") || lastMessage.includes("aplicativo") || lastMessage.includes("web")) {
+    // DADOS / BI
+    else if (
+      lastMessage.includes("dados") ||
+      lastMessage.includes("dashboard") ||
+      lastMessage.includes("power bi") ||
+      lastMessage.includes("relatório")
+    ) {
+      responseText =
+        `Também trabalho com análise de dados e dashboards.
 
-  responseText = `Desenvolvo Sites Web e Apps modernos, focados em performance e experiência do usuário. Gostaria de ver como podemos transformar sua ideia em realidade? ${meuWhats}`;
+Isso ajuda empresas a enxergarem:
+• faturamento
+• clientes
+• oportunidades de crescimento
 
-} 
+Tudo em tempo real.
 
-else if (lastMessage.includes("valor") || lastMessage.includes("preço") || lastMessage.includes("quanto") || lastMessage.includes("custo")) {
+Se quiser conversar sobre isso:
+${meuWhats}`;
+    }
 
-  responseText = `Cada projeto de desenvolvimento ou automação é exclusivo. Para um orçamento preciso, fale diretamente comigo aqui: ${meuWhats}`;
+    // CONTATO
+    else if (
+      lastMessage.includes("contato") ||
+      lastMessage.includes("whatsapp") ||
+      lastMessage.includes("falar")
+    ) {
+      responseText =
+        `Claro. Você pode falar diretamente comigo aqui:
+${meuWhats}`;
+    }
 
-}
+    // RESPOSTA PADRÃO
+    else {
+      responseText =
+        `Olá! Eu sou o assistente do Daniel.
 
-else if (lastMessage.includes("bi") || lastMessage.includes("dados") || lastMessage.includes("dashboard") || lastMessage.includes("power bi")) {
+Ele trabalha com:
+• criação de sites
+• automações com IA
+• dashboards e dados
+• integração entre sistemas
 
-  responseText = `Sou especialista em Power BI e tratamento de dados. Posso criar dashboards que mostram a saúde do seu negócio em tempo real. Chame aqui: ${meuWhats}`;
+O que você gostaria de criar ou melhorar no seu negócio?`;
+    }
 
-}
+    await new Promise((resolve) => setTimeout(resolve, 900));
 
-else if (lastMessage.includes("contato") || lastMessage.includes("whatsapp") || lastMessage.includes("falar")) {
+    return NextResponse.json({ text: responseText });
 
-  responseText = `Com certeza! Você pode falar diretamente com o Daniel pelo WhatsApp para alinhar seu projeto: ${meuWhats}`;
-
-}
-
-else {
-
-  responseText = "Olá! Sou o consultor virtual do Daniel. Especialista em Desenvolvimento Web, Apps, BI e Automações inteligentes. Como posso elevar o nível tecnológico do seu projeto hoje?";
-
-}
-
-
-
-await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-
-return NextResponse.json({ text: responseText });
-
-} catch (error) {
-
-return NextResponse.json({ text: "Olá! Como posso ajudar você com seu projeto hoje?" });
-
-}
-
+  } catch (error) {
+    return NextResponse.json({
+      text: "Tive um pequeno problema técnico. Mas você pode falar direto comigo aqui: https://wa.me/5519992278928",
+    });
+  }
 }

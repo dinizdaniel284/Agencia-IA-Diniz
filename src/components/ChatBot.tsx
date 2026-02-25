@@ -16,6 +16,7 @@ const WHATSAPP_LINK =
 
 export default function ChatBot() {
 
+  const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [showWhatsapp, setShowWhatsapp] = useState(false)
   const [input, setInput] = useState('')
@@ -32,8 +33,13 @@ export default function ChatBot() {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
     const handleOpen = () => setIsOpen(true)
     window.addEventListener('open-daniel-chat', handleOpen)
+
     return () => window.removeEventListener('open-daniel-chat', handleOpen)
   }, [])
 
@@ -146,7 +152,20 @@ Se preferir falar direto com o Daniel, clique no botão verde que apareceu na te
 
   }
 
-  if (!isOpen) return null
+  if (!mounted) return null
+
+  /* BOTÃO FLUTUANTE QUANDO CHAT FECHADO */
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-[9999] bg-cyan-500 text-black px-5 py-3 rounded-full shadow-lg font-bold hover:scale-105 transition"
+      >
+        Falar com IA
+      </button>
+    )
+  }
 
   return (
 
@@ -274,5 +293,4 @@ Se preferir falar direto com o Daniel, clique no botão verde que apareceu na te
     </>
 
   )
-
-        }
+                }

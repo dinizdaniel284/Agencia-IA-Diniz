@@ -131,18 +131,28 @@ export default function Home() {
       img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500',
       tag: 'Sistema',
       url: 'https://ti-saude-frontend.vercel.app',
+      description: 'Sistema web para gestão de saúde com funcionalidades modernas',
     },
     {
       title: 'Plataforma de Vendas',
       img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
       tag: 'SaaS',
       url: 'https://meu-sistema-vendas.vercel.app',
+      description: 'Painel de vendas inteligente, fluxo de pedidos e integração com APIs.',
     },
     {
       title: 'Actus',
       img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500',
       tag: 'Plataforma',
       url: 'https://prototipo-actus.vercel.app',
+      description: 'Protótipo de plataforma com foco em experiência do usuário.',
+    },
+    {
+      title: 'Varejo AI',
+      img: 'https://source.unsplash.com/featured/500x300/?ai,store,commerce',
+      tag: 'E‑commerce IA',
+      url: 'https://varejo-ai-diniz.vercel.app/',
+      description: 'Sistema de varejo com inteligência artificial para otimizar vendas e recomendação de produtos.',
     },
   ]
 
@@ -268,15 +278,16 @@ function Service({ title, text }: any) {
   )
 }
 
-function ProjectCard({ title, img, tag, url }: any) {
+function ProjectCard({ title, img, tag, url, description }: any) {
   return (
     <div style={projectCard}>
       <img src={img} style={{ width: '100%', height: 160, objectFit: 'cover' }} />
       <div style={{ padding: 15 }}>
-        <span>{tag}</span>
-        <h3>{title}</h3>
-        <a href={url} target="_blank">
-          Ver projeto
+        <span style={{ fontSize: 12, opacity: 0.7 }}>{tag}</span>
+        <h3 style={{ margin: '8px 0' }}>{title}</h3>
+        <p style={{ fontSize: 14, color: '#ccc' }}>{description}</p>
+        <a href={url} target="_blank" rel="noreferrer">
+          Ver projeto →
         </a>
       </div>
     </div>

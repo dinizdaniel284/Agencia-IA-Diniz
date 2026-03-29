@@ -17,17 +17,14 @@ const MapContainer: any = dynamicImport(
   () => import('react-leaflet').then((m) => m.MapContainer),
   { ssr: false }
 )
-
 const TileLayer: any = dynamicImport(
   () => import('react-leaflet').then((m) => m.TileLayer),
   { ssr: false }
 )
-
 const Marker: any = dynamicImport(
   () => import('react-leaflet').then((m) => m.Marker),
   { ssr: false }
 )
-
 const Popup: any = dynamicImport(
   () => import('react-leaflet').then((m) => m.Popup),
   { ssr: false }
@@ -42,6 +39,14 @@ if (rawUrl && supabaseAnonKey) {
   supabase = createClient(supabaseUrl, supabaseAnonKey)
 }
 
+type Project = {
+  title: string
+  img: string
+  tag: string
+  url: string
+  description: string
+}
+
 export default function Home() {
   const { locale, toggleLocale } = useLanguage()
   const [mounted, setMounted] = useState(false)
@@ -49,10 +54,12 @@ export default function Home() {
   const [nodes, setNodes] = useState<any[]>([])
   const [mapCenter, setMapCenter] = useState<LatLngTuple>([20, 0])
   const [mapZoom, setMapZoom] = useState(2)
+  const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
     setMounted(true)
     fetchNodes()
+    fetchProjects()
 
     if (typeof window !== 'undefined') {
       const L = require('leaflet')
@@ -78,34 +85,74 @@ export default function Home() {
     }
   }
 
-  async function createNode() {
-    if (!city) return
+  async function fetchProjects() {
+    if (!supabase) {
+      // fallback para projetos padrão
+      setProjects([
+        {
+          title: 'Sistema Saúde',
+          img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500',
+          tag: 'Sistema',
+          url: 'https://ti-saude-frontend.vercel.app',
+          description: 'Sistema web para gestão de saúde com funcionalidades modernas',
+        },
+        {
+          title: 'Plataforma de Vendas',
+          img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
+          tag: 'SaaS',
+          url: 'https://meu-sistema-vendas.vercel.app',
+          description: 'Painel de vendas inteligente, fluxo de pedidos e integração com APIs.',
+        },
+        {
+          title: 'Actus',
+          img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500',
+          tag: 'Plataforma',
+          url: 'https://prototipo-actus.vercel.app',
+          description: 'Protótipo de plataforma com foco em experiência do usuário.',
+        },
+        {
+          title: 'Varejo AI',
+          img: 'https://images.unsplash.com/photo-1612831662556-61de1e8f5e76?w=500', // FIXA para não quebrar
+          tag: 'E‑commerce IA',
+          url: 'https://varejo-ai-diniz.vercel.app/',
+          description: 'Sistema de varejo com inteligência artificial para otimizar vendas e recomendação de produtos.',
+        },
+      ])
+      return
+    }
+
     try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          city
-        )}`
-      )
-      const data = await res.json()
-      if (!data?.length) return
-
-      const latitude = parseFloat(data[0].lat)
-      const longitude = parseFloat(data[0].lon)
-      const cityName = data[0].display_name.split(',')[0]
-
-      setMapCenter([latitude, longitude])
-      setMapZoom(11)
-
-      if (supabase) {
-        await supabase.from('nodes_sistema').insert([
-          { city: cityName, latitude, longitude, type: 'AI Node' },
-        ])
-        fetchNodes()
-      }
-
-      setCity('')
+      const { data } = await supabase.from('projects').select('*')
+      if (data && data.length > 0) setProjects(data)
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  async function addProject(title: string, url: string, tag = 'Projeto') {
+    const description = `Projeto ${title} desenvolvido pela Agência Diniz`
+    let img = ''
+
+    try {
+      // tenta pegar imagem automática pelo título
+      const query = encodeURIComponent(title + ',tech,software')
+      img = `https://source.unsplash.com/featured/500x300/?${query}`
+    } catch (err) {
+      // fallback caso Unsplash quebre
+      img = 'https://images.unsplash.com/photo-1612831662556-61de1e8f5e76?w=500'
+    }
+
+    const newProject: Project = { title, img, url, tag, description }
+
+    if (supabase) {
+      try {
+        await supabase.from('projects').insert([newProject])
+        fetchProjects()
+      } catch (err) {
+        console.log(err)
+      }
+    } else {
+      setProjects((prev) => [...prev, newProject])
     }
   }
 
@@ -124,37 +171,6 @@ export default function Home() {
     projectsTitle: locale === 'pt' ? 'Projetos Desenvolvidos' : 'Projects',
     consultant: locale === 'pt' ? 'CONSULTOR IA' : 'AI CONSULTANT',
   }
-
-  const projects = [
-    {
-      title: 'Sistema Saúde',
-      img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500',
-      tag: 'Sistema',
-      url: 'https://ti-saude-frontend.vercel.app',
-      description: 'Sistema web para gestão de saúde com funcionalidades modernas',
-    },
-    {
-      title: 'Plataforma de Vendas',
-      img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
-      tag: 'SaaS',
-      url: 'https://meu-sistema-vendas.vercel.app',
-      description: 'Painel de vendas inteligente, fluxo de pedidos e integração com APIs.',
-    },
-    {
-      title: 'Actus',
-      img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500',
-      tag: 'Plataforma',
-      url: 'https://prototipo-actus.vercel.app',
-      description: 'Protótipo de plataforma com foco em experiência do usuário.',
-    },
-    {
-      title: 'Varejo AI',
-      img: 'https://source.unsplash.com/featured/500x300/?ai,store,commerce',
-      tag: 'E‑commerce IA',
-      url: 'https://varejo-ai-diniz.vercel.app/',
-      description: 'Sistema de varejo com inteligência artificial para otimizar vendas e recomendação de produtos.',
-    },
-  ]
 
   if (!mounted) return null
 
@@ -194,17 +210,6 @@ export default function Home() {
         </a>
       </section>
 
-      {/* SERVIÇOS */}
-      <section style={{ maxWidth: 1200, width: '100%' }}>
-        <h2 style={sectionTitle}>O que posso construir para sua empresa</h2>
-        <div style={servicesGrid}>
-          <Service title="Automação de Processos" text="Elimine tarefas repetitivas e ganhe produtividade." />
-          <Service title="Integração de Sistemas" text="Conecte CRM, ERP, WhatsApp, APIs e plataformas." />
-          <Service title="Inteligência Artificial" text="Atendimento automático, análise de dados e automações inteligentes." />
-          <Service title="Sistemas Web" text="Plataformas, dashboards e sistemas sob medida." />
-        </div>
-      </section>
-
       {/* PROJETOS */}
       <section style={{ maxWidth: 1200, width: '100%', marginTop: 80 }}>
         <h2 style={sectionTitle}>{texts.projectsTitle}</h2>
@@ -215,66 +220,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* MAPA */}
-      <section style={mapBox}>
-        <h2 style={sectionTitle}>Rede de Sistemas Criados</h2>
-        <p style={{ opacity: 0.7 }}>
-          Cada ponto representa uma cidade onde um sistema ou automação pode operar.
-        </p>
-        <div style={{ display: 'flex', gap: 10, marginTop: 15 }}>
-          <input
-            style={inputStyle}
-            placeholder="Digite uma cidade..."
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-          />
-          <button style={btnStyle} onClick={createNode}>
-            Criar Nó
-          </button>
-        </div>
-        <div style={mapStyle}>
-          <MapContainer center={mapCenter as any} zoom={mapZoom} style={{ height: '100%' }}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {nodes.map((node: any, i) => (
-              <Marker key={i} position={[node.latitude, node.longitude]}>
-                <Popup>{node.city}</Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-      </section>
-
       {/* CHATBOT */}
       <ChatBot />
-
-      {/* BOTÃO FLUTUANTE FIXO */}
-      <button
-        style={{
-          position: 'fixed',
-          bottom: 20,
-          right: 20,
-          padding: 14,
-          borderRadius: '50%',
-          background: '#22d3ee',
-          zIndex: 9999,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        onClick={() => window.dispatchEvent(new Event('open-daniel-chat'))}
-      >
-        <Bot size={24} color="#000" />
-      </button>
     </main>
-  )
-}
-
-function Service({ title, text }: any) {
-  return (
-    <div style={serviceCard}>
-      <h3>{title}</h3>
-      <p>{text}</p>
-    </div>
   )
 }
 
@@ -294,18 +242,13 @@ function ProjectCard({ title, img, tag, url, description }: any) {
   )
 }
 
-// STYLES (sem alterações)
+// STYLES
 const mainStyle: React.CSSProperties = { background: '#020617', color: 'white', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 30 }
 const navStyle = { width: '100%', maxWidth: 1200, display: 'flex', justifyContent: 'space-between', marginBottom: 60 }
 const logoStyle = { display: 'flex', gap: 10, fontWeight: 'bold' }
 const heroStyle = { maxWidth: 900, textAlign: 'center' as const, marginBottom: 60 }
 const ctaStyle = { marginTop: 25, display: 'inline-flex', gap: 8, background: '#22d3ee', padding: '14px 24px', borderRadius: 10, color: '#000', textDecoration: 'none', fontWeight: 'bold' }
 const sectionTitle = { fontSize: 28, marginBottom: 30 }
-const servicesGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }
-const serviceCard = { padding: 20, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }
 const projectGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 20 }
 const projectCard = { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, overflow: 'hidden' }
-const mapBox = { marginTop: 100, maxWidth: 1200, width: '100%' }
-const mapStyle = { height: 420, marginTop: 20, borderRadius: 10, overflow: 'hidden' }
 const btnStyle = { padding: '10px 18px', background: '#22d3ee', border: 'none', borderRadius: 8, cursor: 'pointer' }
-const inputStyle = { flex: 1, padding: 10, borderRadius: 8 }

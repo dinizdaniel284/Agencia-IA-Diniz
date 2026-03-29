@@ -86,46 +86,52 @@ export default function Home() {
   }
 
   async function fetchProjects() {
+    const defaultProjects: Project[] = [
+      {
+        title: 'Sistema Saúde',
+        img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500',
+        tag: 'Sistema',
+        url: 'https://ti-saude-frontend.vercel.app',
+        description: 'Sistema web para gestão de saúde com funcionalidades modernas',
+      },
+      {
+        title: 'Plataforma de Vendas',
+        img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
+        tag: 'SaaS',
+        url: 'https://meu-sistema-vendas.vercel.app',
+        description: 'Painel de vendas inteligente, fluxo de pedidos e integração com APIs.',
+      },
+      {
+        title: 'Actus',
+        img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500',
+        tag: 'Plataforma',
+        url: 'https://prototipo-actus.vercel.app',
+        description: 'Protótipo de plataforma com foco em experiência do usuário.',
+      },
+      {
+        title: 'Varejo AI',
+        img: 'https://images.unsplash.com/photo-1612831662556-61de1e8f5e76?w=500', // FIXA
+        tag: 'E‑commerce IA',
+        url: 'https://varejo-ai-diniz.vercel.app/',
+        description: 'Sistema de varejo com inteligência artificial para otimizar vendas e recomendação de produtos.',
+      },
+    ]
+
     if (!supabase) {
-      // fallback para projetos padrão
-      setProjects([
-        {
-          title: 'Sistema Saúde',
-          img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500',
-          tag: 'Sistema',
-          url: 'https://ti-saude-frontend.vercel.app',
-          description: 'Sistema web para gestão de saúde com funcionalidades modernas',
-        },
-        {
-          title: 'Plataforma de Vendas',
-          img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500',
-          tag: 'SaaS',
-          url: 'https://meu-sistema-vendas.vercel.app',
-          description: 'Painel de vendas inteligente, fluxo de pedidos e integração com APIs.',
-        },
-        {
-          title: 'Actus',
-          img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500',
-          tag: 'Plataforma',
-          url: 'https://prototipo-actus.vercel.app',
-          description: 'Protótipo de plataforma com foco em experiência do usuário.',
-        },
-        {
-          title: 'Varejo AI',
-          img: 'https://images.unsplash.com/photo-1612831662556-61de1e8f5e76?w=500', // FIXA para não quebrar
-          tag: 'E‑commerce IA',
-          url: 'https://varejo-ai-diniz.vercel.app/',
-          description: 'Sistema de varejo com inteligência artificial para otimizar vendas e recomendação de produtos.',
-        },
-      ])
+      setProjects(defaultProjects)
       return
     }
 
     try {
       const { data } = await supabase.from('projects').select('*')
-      if (data && data.length > 0) setProjects(data)
+      if (data && data.length > 0) {
+        setProjects(data)
+      } else {
+        setProjects(defaultProjects)
+      }
     } catch (err) {
       console.log(err)
+      setProjects(defaultProjects)
     }
   }
 
@@ -134,11 +140,9 @@ export default function Home() {
     let img = ''
 
     try {
-      // tenta pegar imagem automática pelo título
       const query = encodeURIComponent(title + ',tech,software')
       img = `https://source.unsplash.com/featured/500x300/?${query}`
     } catch (err) {
-      // fallback caso Unsplash quebre
       img = 'https://images.unsplash.com/photo-1612831662556-61de1e8f5e76?w=500'
     }
 

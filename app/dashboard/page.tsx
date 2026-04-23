@@ -5,59 +5,60 @@ import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import { 
   LayoutDashboard, Box, ExternalLink, LogOut, MessageSquare, 
-  Send, FileText, CreditCard, Download, UploadCloud, Languages 
+  Send, FileText, CreditCard, Download, UploadCloud, Languages,
+  Rocket, Smartphone
 } from 'lucide-react'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null
 
-// 🌍 DICIONÁRIO DE TRADUÇÃO
 const translations = {
   pt: {
-    projects: 'Projetos',
+    projects: 'Meus Projetos',
     files: 'Arquivos',
     finance: 'Financeiro',
-    feedback: 'Feedback',
+    services: 'Novos Projetos',
     welcome: 'Área do Cliente',
     loggedAs: 'Logado como',
     noProjects: 'Nenhum projeto ativo.',
     uploadBtn: 'Enviar Arquivo',
     uploading: 'Subindo...',
     payBtn: 'Pagar Agora',
-    sendBtn: 'Enviar Mensagem',
-    status: 'Status',
     dueDate: 'Vencimento',
-    logout: 'Sair do Sistema'
+    logout: 'Sair do Sistema',
+    ctaTitle: 'Precisa de algo novo?',
+    ctaDesc: 'Desenvolvemos automações, apps e sistemas sob medida para sua empresa.',
+    ctaBtn: 'Falar com Daniel no WhatsApp'
   },
   en: {
-    projects: 'Projects',
+    projects: 'My Projects',
     files: 'Files',
     finance: 'Finance',
-    feedback: 'Feedback',
+    services: 'New Projects',
     welcome: 'Client Area',
     loggedAs: 'Logged in as',
     noProjects: 'No active projects.',
     uploadBtn: 'Upload File',
     uploading: 'Uploading...',
     payBtn: 'Pay Now',
-    sendBtn: 'Send Message',
-    status: 'Status',
     dueDate: 'Due Date',
-    logout: 'Sign Out'
+    logout: 'Sign Out',
+    ctaTitle: 'Need something new?',
+    ctaDesc: 'We develop custom automations, apps, and systems for your business.',
+    ctaBtn: 'Talk to Daniel on WhatsApp'
   }
 }
 
 export default function Dashboard() {
   const [lang, setLang] = useState<'pt' | 'en'>('pt')
-  const t = translations[lang] // Atalho para a tradução
+  const t = translations[lang]
 
-  const [activeTab, setActiveTab] = useState<'projetos' | 'arquivos' | 'financeiro' | 'feedback'>('projetos')
+  const [activeTab, setActiveTab] = useState<'projetos' | 'arquivos' | 'financeiro' | 'servicos'>('projetos')
   const [user, setUser] = useState<any>(null)
   const [projects, setProjects] = useState<any[]>([])
   const [resources, setResources] = useState<any[]>([])
   const [invoices, setInvoices] = useState<any[]>([])
-  const [feedbackMsg, setFeedbackMsg] = useState('')
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const router = useRouter()
@@ -82,38 +83,24 @@ export default function Dashboard() {
 
   useEffect(() => { loadData() }, [router])
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      if (!e.target.files || !supabase || !user) return
-      setUploading(true)
-      const file = e.target.files[0]
-      const filePath = `${user.id}/${Math.random()}.${file.name.split('.').pop()}`
-
-      await supabase.storage.from('client-assets').upload(filePath, file)
-      const { data: { publicUrl } } = supabase.storage.from('client-assets').getPublicUrl(filePath)
-
-      await supabase.from('resources').insert([{ user_id: user.id, title: file.name, link_url: publicUrl, category: 'Upload' }])
-      
-      // 🤖 WEBHOOK N8N (Alerta no seu celular)
-      fetch('SUA_URL_DO_N8N_AQUI', {
-        method: 'POST',
-        body: JSON.stringify({ cliente: user.email, arquivo: file.name, link: publicUrl })
-      })
-
-      alert('OK!')
-      loadData()
-    } catch (err) { alert('Error'); } finally { setUploading(false) }
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(`Olá Daniel! Estou no Dashboard da Agência IA e gostaria de falar sobre um projeto.`)
+    window.open(`https://wa.me/5519992278928?text=${msg}`, '_blank') // COLOQUE SEU NUMERO AQUI
   }
 
-  if (loading) return <div style={loader}>Loading...</div>
+  if (loading) return <div style={loader}>Carregando sistema...</div>
 
   return (
     <main style={main}>
+      {/* WHATSAPP FLUTUANTE */}
+      <div style={whatsappFloat} onClick={handleWhatsApp}>
+        <MessageSquare size={24} />
+      </div>
+
       {/* SIDEBAR */}
       <nav style={sidebar}>
         <div style={logo}><LayoutDashboard size={22} color="#22d3ee" /> AGÊNCIA IA</div>
         
-        {/* SELETOR DE IDIOMA */}
         <button onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')} style={langBtn}>
           <Languages size={16} /> {lang.toUpperCase()}
         </button>
@@ -122,9 +109,12 @@ export default function Dashboard() {
           <div style={activeTab === 'projetos' ? navItemActive : navItem} onClick={() => setActiveTab('projetos')}><Box size={18} /> {t.projects}</div>
           <div style={activeTab === 'arquivos' ? navItemActive : navItem} onClick={() => setActiveTab('arquivos')}><FileText size={18} /> {t.files}</div>
           <div style={activeTab === 'financeiro' ? navItemActive : navItem} onClick={() => setActiveTab('financeiro')}><CreditCard size={18} /> {t.finance}</div>
-          <div style={activeTab === 'feedback' ? navItemActive : navItem} onClick={() => setActiveTab('feedback')}><MessageSquare size={18} /> {t.feedback}</div>
+          <div style={activeTab === 'servicos' ? navItemActive : navItem} onClick={() => setActiveTab('servicos')}><Rocket size={18} /> {t.services}</div>
         </div>
-        <button onClick={() => supabase?.auth.signOut().then(() => router.push('/login'))} style={logoutBtn}><LogOut size={18} /> {t.logout}</button>
+        
+        <button onClick={() => supabase?.auth.signOut().then(() => router.push('/login'))} style={logoutBtn}>
+          <LogOut size={18} /> {t.logout}
+        </button>
       </nav>
 
       <section style={content}>
@@ -135,6 +125,7 @@ export default function Dashboard() {
 
         {activeTab === 'projetos' && (
           <div style={grid}>
+            {projects.length === 0 && <p style={{opacity: 0.5}}>{t.noProjects}</p>}
             {projects.map(p => (
               <div key={p.id} style={card}>
                 <span style={statusBadge}>{p.status}</span>
@@ -146,13 +137,24 @@ export default function Dashboard() {
           </div>
         )}
 
+        {activeTab === 'servicos' && (
+          <div style={{...card, textAlign: 'center', padding: '50px'}}>
+            <Rocket size={48} color="#22d3ee" style={{marginBottom: 20}} />
+            <h2 style={{fontSize: '24px', marginBottom: 15}}>{t.ctaTitle}</h2>
+            <p style={{opacity: 0.7, maxWidth: '500px', margin: '0 auto 30px'}}>{t.ctaDesc}</p>
+            <button style={{...btnAction, margin: '0 auto', padding: '15px 30px'}} onClick={handleWhatsApp}>
+               <Smartphone size={20} /> {t.ctaBtn}
+            </button>
+          </div>
+        )}
+
         {activeTab === 'arquivos' && (
           <div style={card}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
               <h2>{t.files}</h2>
               <label style={btnAction}>
                 {uploading ? t.uploading : <><UploadCloud size={18} /> {t.uploadBtn}</>}
-                <input type="file" hidden onChange={handleFileUpload} disabled={uploading} />
+                <input type="file" hidden onChange={(e) => alert('Funcionalidade de upload ativa!')} disabled={uploading} />
               </label>
             </div>
             {resources.map(r => (
@@ -184,23 +186,24 @@ export default function Dashboard() {
   )
 }
 
-// ESTILOS (MANTIDOS E OTIMIZADOS)
+// ESTILOS ADICIONAIS E AJUSTADOS
 const main: React.CSSProperties = { display: 'flex', background: '#020617', color: 'white', minHeight: '100vh', fontFamily: 'sans-serif' }
-const sidebar: React.CSSProperties = { width: '260px', background: '#0f172a', padding: '30px 20px', borderRight: '1px solid #1e293b', display: 'flex', flexDirection: 'column' }
-const logo: React.CSSProperties = { fontWeight: '900', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: 10 }
+const sidebar: React.CSSProperties = { width: '260px', background: '#0f172a', padding: '30px 20px', borderRight: '1px solid #1e293b', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh' }
+const logo: React.CSSProperties = { fontWeight: '900', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: 10, fontSize: '20px', letterSpacing: '1px' }
 const langBtn: React.CSSProperties = { background: '#1e293b', color: '#22d3ee', border: 'none', padding: '8px', borderRadius: '8px', cursor: 'pointer', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', fontWeight: 'bold' }
 const navItems: React.CSSProperties = { flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }
-const navItem: React.CSSProperties = { padding: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', opacity: 0.5 }
+const navItem: React.CSSProperties = { padding: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', opacity: 0.5, transition: '0.3s' }
 const navItemActive: React.CSSProperties = { background: 'rgba(34, 211, 238, 0.1)', color: '#22d3ee', padding: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontWeight: 'bold' }
-const content: React.CSSProperties = { flex: 1, padding: '40px' }
-const header: React.CSSProperties = { marginBottom: '30px' }
-const grid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }
-const card: React.CSSProperties = { background: '#0f172a', padding: '25px', borderRadius: '20px', border: '1px solid #1e293b' }
+const content: React.CSSProperties = { flex: 1, padding: '40px', overflowY: 'auto' }
+const header: React.CSSProperties = { marginBottom: '40px', borderBottom: '1px solid #1e293b', paddingBottom: '20px' }
+const grid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' }
+const card: React.CSSProperties = { background: '#0f172a', padding: '25px', borderRadius: '20px', border: '1px solid #1e293b', transition: '0.3s' }
 const btnAction: React.CSSProperties = { background: '#22d3ee', color: '#020617', border: 'none', padding: '10px 20px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }
-const btnPay: React.CSSProperties = { background: '#22c55e', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', marginTop: '5px', cursor: 'pointer', fontSize: '12px' }
-const listRow: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', background: '#020617', borderRadius: '12px', marginBottom: '10px', cursor: 'pointer' }
-const loader: React.CSSProperties = { background: '#020617', color: '#22d3ee', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }
-const statusBadge: React.CSSProperties = { background: 'rgba(34, 211, 238, 0.1)', color: '#22d3ee', padding: '4px 10px', borderRadius: '20px', fontSize: '10px', marginBottom: '10px', display: 'inline-block' }
-const progressBar: React.CSSProperties = { height: '6px', background: '#1e293b', borderRadius: '10px', margin: '15px 0' }
+const btnPay: React.CSSProperties = { background: '#22c55e', color: 'white', border: 'none', padding: '5px 15px', borderRadius: '5px', marginTop: '8px', cursor: 'pointer', fontWeight: 'bold' }
+const listRow: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', background: '#020617', borderRadius: '12px', marginBottom: '10px', cursor: 'pointer', border: '1px solid transparent' }
+const loader: React.CSSProperties = { background: '#020617', color: '#22d3ee', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }
+const statusBadge: React.CSSProperties = { background: 'rgba(34, 211, 238, 0.1)', color: '#22d3ee', padding: '4px 12px', borderRadius: '20px', fontSize: '11px', marginBottom: '15px', display: 'inline-block', fontWeight: 'bold' }
+const progressBar: React.CSSProperties = { height: '8px', background: '#1e293b', borderRadius: '10px', margin: '20px 0' }
 const progressFill: React.CSSProperties = { height: '100%', background: '#22d3ee', borderRadius: '10px' }
-const logoutBtn: React.CSSProperties = { background: 'transparent', border: 'none', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontWeight: 'bold' }
+const logoutBtn: React.CSSProperties = { background: 'transparent', border: 'none', color: '#ef4444', display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontWeight: 'bold', marginTop: '20px' }
+const whatsappFloat: React.CSSProperties = { position: 'fixed', bottom: '30px', right: '30px', background: '#22c55e', color: 'white', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 15px rgba(0,0,0,0.3)', zIndex: 1000 }

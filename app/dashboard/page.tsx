@@ -86,7 +86,7 @@ export default function Dashboard() {
 
   const handleWhatsApp = () => {
     const msg = encodeURIComponent(`Olá Daniel! Estou no Dashboard da Agência IA e gostaria de falar sobre um projeto.`)
-    window.open(`https://wa.me/5519999059530?text=${msg}`, '_blank') 
+    window.open(`https://wa.me/5519992278928?text=${msg}`, '_blank') 
   }
 
   const changeTab = (tab: any) => {

@@ -3,16 +3,15 @@
 export const dynamic = 'force-dynamic'
 
 import React, { useEffect, useState } from 'react'
-import { ArrowRight, Cpu, User, Languages, Lock, Globe, Bot, Layout, Zap, X } from 'lucide-react'
+import { ArrowRight, Cpu, User, Languages, Lock, Globe, Bot, Layout, Zap } from 'lucide-react'
 import ChatBot from '@/components/ChatBot'
 import { createClient } from '@supabase/supabase-js'
-import { useRouter } from 'next/navigation'
 
 const translations = {
   pt: {
     navServices: 'Serviços',
     navOrder: 'Entrar',
-    heroBadge: '🚀 Plataforma de Soluções Tech',
+    heroBadge: '?? Plataforma de Soluções Tech',
     heroTitle: 'Contrate soluções de {span} sob medida.',
     heroSubtitle: 'Desenvolvedor Full Stack especializado em Web3, Automações e Landing Pages.',
     heroPlaceholder: 'Seu melhor e-mail...',
@@ -31,18 +30,12 @@ const translations = {
     historyTitle: 'Da operação de máquinas ao código de elite',
     historyDesc: 'Minha história começou no campo, operando máquinas pesadas. Hoje, aplico essa mesma disciplina para construir arquiteturas de software robustas.',
     alertLead: 'Show Daniel! O e-mail {email} foi registrado!',
-    alertError: 'Ops! Erro ao registrar. Tente novamente.',
-    authTitleLogin: 'Bem-vindo de volta',
-    authTitleSignup: 'Criar sua conta',
-    authSwitchToSignup: 'Não tem conta? Crie agora',
-    authSwitchToLogin: 'Já tem conta? Faça login',
-    authBtnLogin: 'Entrar no Painel',
-    authBtnSignup: 'Cadastrar e Acessar'
+    alertError: 'Ops! Erro ao registrar. Tente novamente.'
   },
   en: {
     navServices: 'Services',
     navOrder: 'Login',
-    heroBadge: '🚀 Tech Solutions Platform',
+    heroBadge: '?? Tech Solutions Platform',
     heroTitle: 'Hire custom {span} solutions.',
     heroSubtitle: 'Full Stack Developer specialized in Web3, Automation, and Landing Pages.',
     heroPlaceholder: 'Your best email...',
@@ -61,31 +54,21 @@ const translations = {
     historyTitle: 'From machinery to elite coding',
     historyDesc: 'My story started in the fields, operating heavy machinery. Today, I apply that same discipline to build robust software architectures.',
     alertLead: 'Great! {email} has been registered!',
-    alertError: 'Ops! Error registering. Please try again.',
-    authTitleLogin: 'Welcome Back',
-    authTitleSignup: 'Create your account',
-    authSwitchToSignup: "Don't have an account? Sign up",
-    authSwitchToLogin: 'Already have an account? Login',
-    authBtnLogin: 'Login to Dashboard',
-    authBtnSignup: 'Sign Up & Access'
+    alertError: 'Ops! Error registering. Please try again.'
   }
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
 
 export default function Home() {
   const [lang, setLang] = useState<'pt' | 'en'>('pt')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [isMobile, setIsMobile] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [isSignUp, setIsSignUp] = useState(false)
-  
+
   const t = translations[lang]
-  const router = useRouter()
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768)
@@ -94,13 +77,16 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Captura de Lead (WhatsApp)
   const handleLeadCapture = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     if (supabase) {
       const { error } = await supabase.from('leads').insert([{ email: email }]);
-      if (error) { alert(t.alertError); setLoading(false); return; }
+      if (error) {
+        alert(t.alertError);
+        setLoading(false);
+        return;
+      }
     }
     alert(t.alertLead.replace('{email}', email));
     window.open(`https://wa.me/5519992278928?text=Olá Daniel! Cadastro no site: ${email}`, '_blank');
@@ -108,49 +94,8 @@ export default function Home() {
     setLoading(false);
   };
 
-  // Autenticação (Login ou Cadastro)
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    if (!supabase) return
-
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password })
-      if (error) alert(error.message)
-      else {
-        alert(lang === 'pt' ? 'Conta criada! Verifique seu e-mail ou faça login.' : 'Account created! Check your email or login.')
-        setIsSignUp(false)
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) alert(error.message)
-      else router.push('/dashboard')
-    }
-    setLoading(false)
-  }
-
   return (
     <main style={main}>
-      {/* MODAL DE LOGIN / CADASTRO */}
-      {showAuthModal && (
-        <div style={modalOverlay}>
-          <div style={modalCard}>
-            <button onClick={() => setShowAuthModal(false)} style={closeModal}><X size={20} /></button>
-            <h2 style={{marginBottom: 20, textAlign: 'center'}}>{isSignUp ? t.authTitleSignup : t.authTitleLogin}</h2>
-            <form onSubmit={handleAuth} style={{display: 'flex', flexDirection: 'column', gap: 15}}>
-              <input type="email" placeholder="E-mail" style={input} required value={email} onChange={(e) => setEmail(e.target.value)} />
-              <input type="password" placeholder="Password" style={input} required value={password} onChange={(e) => setPassword(e.target.value)} />
-              <button type="submit" style={cta} disabled={loading}>
-                {loading ? '...' : (isSignUp ? t.authBtnSignup : t.authBtnLogin)}
-              </button>
-            </form>
-            <p onClick={() => setIsSignUp(!isSignUp)} style={switchAuth}>
-              {isSignUp ? t.authSwitchToLogin : t.authSwitchToSignup}
-            </p>
-          </div>
-        </div>
-      )}
-
       <nav style={{...nav, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 15 : 0}}>
         <div style={logo}><Cpu size={22} color="#22d3ee" /> AGÊNCIA <span style={{color: '#22d3ee'}}>IA</span> DINIZ</div>
         <div style={{...navLinks, gap: isMobile ? 10 : 20}}>
@@ -158,7 +103,7 @@ export default function Home() {
             <Languages size={14} /> {lang.toUpperCase()}
           </button>
           {!isMobile && <a href="#servicos" style={link}>{t.navServices}</a>}
-          <button style={btnSmall} onClick={() => setShowAuthModal(true)}>
+          <button style={btnSmall} onClick={() => window.location.href = '/login'}>
             <Lock size={14} /> {t.navOrder}
           </button>
         </div>
@@ -178,10 +123,8 @@ export default function Home() {
             {loading ? '...' : t.heroCta} <ArrowRight size={18} />
           </button>
         </form>
-        <p style={{fontSize: 12, opacity: 0.5, marginTop: 15}}>{t.heroStats}</p>
       </section>
 
-      {/* SEÇÃO SERVIÇOS */}
       <section id="servicos" style={{ padding: '60px 0', background: 'rgba(15, 23, 42, 0.3)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: isMobile ? '1.8rem' : '2.5rem' }}>
           {t.servicesTitle}
@@ -202,34 +145,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{...historySection, padding: isMobile ? '60px 20px' : '80px 5%'}}>
-        <div style={{...historyContent, flexDirection: isMobile ? 'column' : 'row'}}>
-            <div style={profileCircle}><User size={isMobile ? 50 : 80} color="#22d3ee" /></div>
-            <div style={{textAlign: isMobile ? 'center' : 'left', flex: 1}}>
-                <span style={badge}>{t.historyBadge}</span>
-                <h2 style={{fontSize: isMobile ? '1.8rem' : '2.2rem', margin: '10px 0'}}>{t.historyTitle}</h2>
-                <p style={{opacity: 0.8, lineHeight: '1.6', maxWidth: 600}}>{t.historyDesc}</p>
-                <div style={{...statsLine, justifyContent: isMobile ? 'center' : 'flex-start'}}>
-                    <span style={milestone}><b>2026</b> Agência IA</span>
-                    <span style={milestone}><b>Web3</b> Expert</span>
-                </div>
-            </div>
-        </div>
-      </section>
-
       <footer style={footer}><p>© 2026 Agência IA Diniz</p></footer>
-      <ChatBot />
     </main>
   )
 }
 
-// ESTILOS ADICIONAIS PARA O MODAL
-const modalOverlay: React.CSSProperties = { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }
-const modalCard: React.CSSProperties = { background: '#0f172a', padding: '40px', borderRadius: '20px', width: '100%', maxWidth: '400px', position: 'relative', border: '1px solid rgba(34, 211, 238, 0.2)' }
-const closeModal: React.CSSProperties = { position: 'absolute', top: 15, right: 15, background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }
-const switchAuth: React.CSSProperties = { marginTop: 20, textAlign: 'center', fontSize: '13px', opacity: 0.6, cursor: 'pointer', textDecoration: 'underline' }
-
-// ESTILOS EXISTENTES
 const main: React.CSSProperties = { background: '#020617', color: 'white', minHeight: '100vh', fontFamily: 'sans-serif', overflowX: 'hidden' }
 const nav: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 5%', borderBottom: '1px solid rgba(255,255,255,0.05)' }
 const navLinks: React.CSSProperties = { display: 'flex', alignItems: 'center' }
@@ -241,14 +161,9 @@ const badge: React.CSSProperties = { background: 'rgba(34, 211, 238, 0.1)', colo
 const mainTitle: React.CSSProperties = { fontWeight: 800, maxWidth: '800px', margin: '0 auto 20px', lineHeight: '1.2' }
 const subtitle: React.CSSProperties = { color: '#94a3b8', maxWidth: '600px', margin: '0 auto 30px' }
 const formHero: React.CSSProperties = { display: 'flex', gap: '10px', maxWidth: '500px', margin: '0 auto' }
-const input: React.CSSProperties = { width: '100%', padding: '15px', borderRadius: '10px', border: '1px solid #1e293b', background: '#0f172a', color: 'white' }
+const input: React.CSSProperties = { flex: 1, padding: '15px', borderRadius: '10px', border: '1px solid #1e293b', background: '#0f172a', color: 'white' }
 const cta: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#22d3ee', padding: '15px 20px', borderRadius: 10, color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' }
-const historySection: React.CSSProperties = { background: '#0f172a', display: 'flex', justifyContent: 'center' }
-const historyContent: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '40px', maxWidth: '1000px' }
-const profileCircle: React.CSSProperties = { width: '120px', height: '120px', borderRadius: '50%', border: '3px solid #22d3ee', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
-const statsLine: React.CSSProperties = { marginTop: '20px', display: 'flex', gap: '15px' }
-const milestone: React.CSSProperties = { fontSize: '12px', background: '#1e293b', padding: '5px 10px', borderRadius: '5px' }
-const btnSmall: React.CSSProperties = { background: 'transparent', border: '1px solid #22d3ee', color: '#22d3ee', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 5 }
 const footer: React.CSSProperties = { textAlign: 'center', padding: '30px', opacity: 0.5, fontSize: '12px' }
-const carouselTrack: React.CSSProperties = { display: 'flex', gap: '20px', padding: '10px 5%', overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }
-const serviceCard: React.CSSProperties = { minWidth: '280px', background: 'rgba(30, 41, 59, 0.5)', padding: '30px', borderRadius: '20px', border: '1px solid rgba(34, 211, 238, 0.1)', scrollSnapAlign: 'start' }
+const carouselTrack: React.CSSProperties = { display: 'flex', gap: '20px', padding: '10px 5%', overflowX: 'auto', scrollbarWidth: 'none' }
+const serviceCard: React.CSSProperties = { minWidth: '280px', background: 'rgba(30, 41, 59, 0.5)', padding: '30px', borderRadius: '20px', border: '1px solid rgba(34, 211, 238, 0.1)' }
+const btnSmall: React.CSSProperties = { background: 'transparent', border: '1px solid #22d3ee', color: '#22d3ee', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 5 }

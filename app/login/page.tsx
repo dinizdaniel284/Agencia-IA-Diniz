@@ -3,8 +3,9 @@
 import React, { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { LogIn, UserPlus, ArrowRight, ShieldCheck } from 'lucide-react'
+import { LogIn, UserPlus, ArrowLeft, ShieldCheck } from 'lucide-react'
 
+// Configuração do Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null
@@ -30,7 +31,7 @@ export default function LoginPage() {
           options: { emailRedirectTo: `${window.location.origin}/dashboard` }
         })
         if (error) throw error
-        alert('Conta criada! Verifique seu e-mail para confirmar o cadastro.')
+        alert('Conta criada! Verifique seu e-mail para confirmar o cadastro (ou tente logar se a confirmação estiver desativada).')
         setIsSignUp(false)
       } else {
         // LÓGICA DE LOGIN
@@ -48,6 +49,15 @@ export default function LoginPage() {
   return (
     <main style={container}>
       <div style={card}>
+        
+        {/* BOTÃO VOLTAR PARA HOME */}
+        <button 
+          onClick={() => router.push('/')} 
+          style={backBtn}
+        >
+          <ArrowLeft size={16} /> Voltar para o início
+        </button>
+
         <div style={header}>
           <div style={iconBox}><ShieldCheck size={32} color="#22d3ee" /></div>
           <h2 style={title}>{isSignUp ? 'Criar Nova Conta' : 'Acessar Painel'}</h2>
@@ -83,7 +93,7 @@ export default function LoginPage() {
 
           <button type="submit" disabled={loading} style={btn}>
             {loading ? 'Aguarde...' : (
-              isSignUp ? <><UserPlus size={18} /> Cadastrar</> : <><LogIn size={18} /> Entrar</>
+              isSignUp ? <><UserPlus size={18} /> Criar minha conta</> : <><LogIn size={18} /> Entrar no sistema</>
             )}
           </button>
         </form>
@@ -101,17 +111,100 @@ export default function LoginPage() {
   )
 }
 
-// ESTILOS
-const container: React.CSSProperties = { background: '#020617', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'sans-serif' }
-const card: React.CSSProperties = { background: '#0f172a', padding: '40px', borderRadius: '24px', border: '1px solid #1e293b', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' }
+// --- ESTILOS (CSS-in-JS) ---
+const container: React.CSSProperties = { 
+  background: '#020617', 
+  height: '100vh', 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  color: 'white', 
+  fontFamily: 'sans-serif',
+  padding: '20px'
+}
+
+const card: React.CSSProperties = { 
+  background: '#0f172a', 
+  padding: '40px', 
+  borderRadius: '24px', 
+  border: '1px solid #1e293b', 
+  width: '100%', 
+  maxWidth: '400px', 
+  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)' 
+}
+
+const backBtn: React.CSSProperties = { 
+  background: 'none', 
+  border: 'none', 
+  color: '#94a3b8', 
+  cursor: 'pointer', 
+  fontSize: '14px', 
+  display: 'flex', 
+  alignItems: 'center', 
+  gap: '5px', 
+  marginBottom: '20px',
+  padding: '0',
+  transition: '0.3s'
+}
+
 const header: React.CSSProperties = { textAlign: 'center', marginBottom: '30px' }
-const iconBox: React.CSSProperties = { background: 'rgba(34, 211, 238, 0.1)', width: '60px', height: '60px', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px' }
+
+const iconBox: React.CSSProperties = { 
+  background: 'rgba(34, 211, 238, 0.1)', 
+  width: '60px', 
+  height: '60px', 
+  borderRadius: '15px', 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  margin: '0 auto 15px' 
+}
+
 const title: React.CSSProperties = { fontSize: '24px', fontWeight: 'bold', marginBottom: '8px' }
+
 const subtitle: React.CSSProperties = { fontSize: '14px', opacity: 0.6 }
+
 const form: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '20px' }
+
 const inputGroup: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '8px' }
+
 const label: React.CSSProperties = { fontSize: '14px', fontWeight: '500', color: '#94a3b8' }
-const input: React.CSSProperties = { background: '#020617', border: '1px solid #1e293b', padding: '12px 16px', borderRadius: '12px', color: 'white', fontSize: '16px', outline: 'none' }
-const btn: React.CSSProperties = { background: '#22d3ee', color: '#020617', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s', marginTop: '10px' }
+
+const input: React.CSSProperties = { 
+  background: '#020617', 
+  border: '1px solid #1e293b', 
+  padding: '12px 16px', 
+  borderRadius: '12px', 
+  color: 'white', 
+  fontSize: '16px', 
+  outline: 'none',
+  transition: '0.3s'
+}
+
+const btn: React.CSSProperties = { 
+  background: '#22d3ee', 
+  color: '#020617', 
+  border: 'none', 
+  padding: '14px', 
+  borderRadius: '12px', 
+  fontWeight: 'bold', 
+  fontSize: '16px', 
+  cursor: 'pointer', 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  gap: '10px', 
+  transition: '0.3s', 
+  marginTop: '10px' 
+}
+
 const footer: React.CSSProperties = { marginTop: '25px', textAlign: 'center' }
-const toggleBtn: React.CSSProperties = { background: 'none', border: 'none', color: '#22d3ee', cursor: 'pointer', fontSize: '14px', fontWeight: '500' }
+
+const toggleBtn: React.CSSProperties = { 
+  background: 'none', 
+  border: 'none', 
+  color: '#22d3ee', 
+  cursor: 'pointer', 
+  fontSize: '14px', 
+  fontWeight: '500' 
+}
